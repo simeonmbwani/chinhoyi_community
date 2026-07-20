@@ -23,18 +23,13 @@ def register(request):
             login(request, user)
             messages.success(request, "Registration successful. Welcome!")
 
-            # 🚨 Redirect providers to payment if unpaid
-            if user.role == "provider" and not user.is_paid:
-              return redirect('accounts:payment_gateway')
-
-            # Buyers go straight to dashboard
+            # ✅ No payment redirect here — all users go to dashboard
             return redirect('dashboard:dashboard')
         else:
             messages.error(request, "Please correct the errors below.")
     else:
         form = UserRegistrationForm()
     return render(request, 'accounts/register.html', {'form': form})
-
 
 class CustomLoginView(LoginView):
     template_name = 'accounts/login.html'
@@ -129,16 +124,18 @@ def payment_gateway(request, listing_id=None):
         transaction_ref = request.POST.get("transaction_ref")
 
         if transaction_ref:
-            # Save transaction record with both amount and service fee
+            # Save transaction record
             Transaction.objects.create(
                 user=request.user,
                 listing=listing,
-                amount=amount,              # total charged
-                service_fee=service_fee,    # platform fee
+                amount=amount,
+                service_fee=service_fee,
                 transaction_type="payment",
                 status="success",
                 reference=transaction_ref,
-                timestamp=timezone.now(),
+                payment_date=timezone.now(),   # ✅ always a datetime object
+                payment_reference=transaction_ref,
+                payment_status="success"
             )
 
             # Mark provider as paid
@@ -148,7 +145,7 @@ def payment_gateway(request, listing_id=None):
             # If tied to a listing, mark payment done but keep inactive until admin approves
             if listing:
                 listing.payment_reference = transaction_ref
-                listing.payment_date = timezone.now()
+                listing.payment_date = timezone.now()   # ✅ proper datetime
                 listing.payment_status = "completed"
                 listing.is_active = False       # stays inactive until admin approves
                 listing.status = "pending"
@@ -173,7 +170,6 @@ def payment_gateway(request, listing_id=None):
         "ecocash_number": ECOCASH_NUMBER,
     }
     return render(request, "accounts/payment.html", context)
-
 
 
 @login_required

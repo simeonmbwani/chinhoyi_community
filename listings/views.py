@@ -19,28 +19,31 @@ def create_listing(request):
         messages.error(request, "Your account is awaiting admin approval before you can post listings.")
         return redirect("dashboard:dashboard")
 
+    # 3. Payment Check (providers must pay before posting)
+    if not request.user.is_paid:
+        messages.warning(request, "You must complete payment before posting a listing.")
+        return redirect("accounts:payment_gateway")
+
     if request.method == "POST":
         form = ListingForm(request.POST, request.FILES)
         if form.is_valid():
             listing = form.save(commit=False)
             listing.user = request.user
-            listing.is_active = False   # ✅ keep inactive until payment confirmed
+            listing.is_active = False   # stays inactive until admin approves
+            listing.status = "pending"
             listing.save()
 
-            # 3. Dynamic Fee Calculation (per post)
+            # Optional: dynamic fee calculation for reporting
             fee = calculate_service_fee(listing.price, listing.category)
             request.session["calculated_fee"] = float(fee)
 
-            # 🚨 Reset provider payment status until admin confirms
-            request.user.is_paid = False
-            request.user.save()
-
-            messages.info(request, "Listing saved in pending state. Please complete payment.")
-            return redirect("accounts:payment_gateway", listing_id=listing.id)
+            messages.success(request, "Listing submitted successfully. Awaiting admin approval.")
+            return redirect("dashboard:dashboard")
     else:
         form = ListingForm()
 
     return render(request, "listings/create_listing.html", {"form": form})
+
 
 def list_listings(request):
     query = request.GET.get('q')
