@@ -36,11 +36,6 @@ ALLOWED_HOSTS = [
     "127.0.0.1"
 ]
 
-
-# Get ALLOWED_HOSTS from an environment variable, fallback to localhost
-ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
-
-
 # Application definition
 
 INSTALLED_APPS = [
