@@ -51,8 +51,7 @@ INSTALLED_APPS = [
     'messaging',
     'dashboard',
     'notifications',
-    'cloudinary',
-    'cloudinary_storage',
+
     # Add your accounts app here
 
 ]
