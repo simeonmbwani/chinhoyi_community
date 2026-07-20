@@ -1,0 +1,21 @@
+{
+  "Payments": {
+    "amount": "Each product/service listing requires a small service fee, calculated dynamically based on category and price.",
+    "middlemen": "Our platform eliminates middlemen charges — you connect directly with providers."
+  },
+  "Listings": {
+    "post": "To post a product/service, go to your dashboard → 'Create Listing'. Providers must complete payment before posting.",
+    "delete": "You can delete a listing from your dashboard under 'My Listings'.",
+    "contact provider": "Open the listing and click 'Contact Provider' to start a WhatsApp-style chat.",
+    "search": "Use the search bar at the top of the homepage to find products or services."
+  },
+  "Complaints": {
+    "complain": "Log complaints via 'Report an Issue' → include transaction reference ID for fraud cases.",
+    "fraud": "Please log complaints via 'Report an Issue' → include transaction reference ID for fraud cases.",
+    "ghost account": "Ghost accounts are flagged and removed by admin. Report suspicious accounts via 'Report an Issue'."
+  },
+  "General": {
+    "working hours": "Our support team is available daily from 8 AM to 6 PM.",
+    "login": "Use the login form at the top right. If you forgot your password, click 'Forgot Password'."
+  }
+}

@@ -133,21 +133,21 @@ def payment_gateway(request, listing_id=None):
                 transaction_type="payment",
                 status="success",
                 reference=transaction_ref,
-                payment_date=timezone.now(),   # ✅ always a datetime object
+                payment_date=timezone.now(),
                 payment_reference=transaction_ref,
                 payment_status="success"
             )
 
-            # Mark provider as paid
+            # ✅ Mark provider as paid
             request.user.is_paid = True
             request.user.save(update_fields=["is_paid"])
 
-            # If tied to a listing, mark payment done but keep inactive until admin approves
+            # ✅ If tied to a listing, mark payment done but keep inactive until admin approves
             if listing:
                 listing.payment_reference = transaction_ref
-                listing.payment_date = timezone.now()   # ✅ proper datetime
+                listing.payment_date = timezone.now()
                 listing.payment_status = "completed"
-                listing.is_active = False       # stays inactive until admin approves
+                listing.is_active = False   # stays inactive until admin approves
                 listing.status = "pending"
                 listing.save(update_fields=[
                     "payment_reference", "payment_date", "payment_status", "is_active", "status"
