@@ -1,0 +1,127 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-5">
+    <div class="card shadow-lg p-4">
+        <h1>{{ listing.title }}</h1>
+        <p class="text-muted">
+            Posted by: {{ listing.user.username }}
+            {% if listing.user.is_verified %}
+                <span class="badge bg-success ms-2">Verified Provider</span>
+            {% else %}
+                <span class="badge bg-warning ms-2">Unverified</span>
+            {% endif %}
+        </p>
+        
+        <div class="my-4 text-center" style="max-height: 400px; overflow: hidden; background-color: #f8f9fa;">
+            <img src="{{ listing.image.url }}" 
+                 class="img-fluid rounded" 
+                 style="max-height: 400px; width: auto; object-fit: contain;" 
+                 alt="{{ listing.product_name }}">
+        </div>
+        
+        <h3>Description</h3>
+        <p>{{ listing.description }}</p>
+        
+        <h4 class="text-success mb-4">Price: ${{ listing.price }}</h4>
+
+        <!-- Reviews Section -->
+        <h4>⭐ Reviews</h4>
+        {% if avg_rating %}
+            <p>Average Rating: {{ avg_rating }}/5</p>
+        {% else %}
+            <p class="text-muted">No ratings yet</p>
+        {% endif %}
+        
+        <ul class="list-group mb-3">
+            {% for review in listing.reviews.all %}
+                <li class="list-group-item">
+                    <strong>{{ review.reviewer.username }}</strong> — {{ review.rating }}⭐
+                    <br>
+                    {{ review.comment }}
+                    <small class="text-muted">({{ review.created_at|date:"M d, Y" }})</small>
+                </li>
+            {% empty %}
+                <li class="list-group-item text-center text-muted">No reviews yet. Be the first!</li>
+            {% endfor %}
+        </ul>
+
+        <!-- Review Form -->
+        {% if user.is_authenticated and user != listing.user %}
+        <div class="d-flex gap-2 mb-3">
+            <!-- Buttons -->
+          <a href="{% url 'messaging:start_chat_from_listing' listing.id %}" class="btn btn-success">
+        💬 Message Provider
+           </a>
+            <button type="button" class="btn btn-outline-warning" id="showReviewBtn">Leave a Review</button>
+        </div>
+
+        <div id="reviewForm" style="display:none;">
+            <form method="POST" action="{% url 'accounts:add_review' listing.id %}">
+                {% csrf_token %}
+                <div class="mb-2">
+                    <label class="form-label">Rating:</label>
+                    <select name="rating" class="form-select">
+                        <option value="5">5⭐⭐⭐⭐⭐</option>
+                        <option value="4">4⭐⭐⭐⭐</option>
+                        <option value="3">3⭐⭐⭐</option>
+                        <option value="2">2⭐⭐</option>
+                        <option value="1">1⭐</option>
+                    </select>
+                </div>
+                <div class="mb-2">
+                    <textarea name="comment" class="form-control" rows="3" placeholder="Write your review..."></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Submit</button>
+                <button type="button" class="btn btn-secondary" id="cancelReviewBtn">Cancel</button>
+            </form>
+        </div>
+        <script>
+            document.getElementById('showReviewBtn').onclick = function(){
+                document.getElementById('reviewForm').style.display = 'block';
+                this.style.display = 'none';
+            }
+            document.getElementById('cancelReviewBtn').onclick = function(){
+                document.getElementById('reviewForm').style.display = 'none';
+                document.getElementById('showReviewBtn').style.display = 'inline-block';
+            }
+        </script>
+        {% endif %}
+
+        <!-- Owner Controls -->
+        {% if user.is_authenticated %}
+            {% if user == listing.user %}
+                <div class="alert alert-secondary">
+                    <h5>Owner Controls</h5>
+                    <div class="d-flex gap-2">
+                        <a href="{% url 'listings:edit_listing' listing.id %}" class="btn btn-warning">Edit Listing</a>
+                        <form method="POST" action="{% url 'listings:delete_listing' listing.id %}" onsubmit="return confirm('Are you sure?');">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger">Delete Listing</button>
+                        </form>
+                    </div>
+                </div>
+            {% else %}
+                <form class="card p-3 border-primary mb-4">
+                    <div class="card p-3 border-primary mb-4">
+    <h5>Schedule or Request Quote</h5>
+    <form method="POST" action="{% url 'listings:create_booking' listing.pk %}">
+        {% csrf_token %}
+        <select name="request_type" class="form-select mb-2">
+            <option value="appointment">Appointment</option>
+            <option value="quote">Request Quote</option>
+        </select>
+        <textarea name="customer_message" class="form-control mb-2" rows="3" placeholder="Add details..."></textarea>
+        <button type="submit" class="btn btn-info w-100">Send Request</button>
+    </form>
+</div>
+</form>
+                </div>
+            {% endif %}
+        {% endif %}
+        
+        <div class="mt-4">
+            <a href="{% url 'listings:list_listings' %}" class="btn btn-secondary">Back to Market</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,39 @@
+<div class="modal-header">
+    <h5 class="modal-title">User Verification</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+</div>
+
+<div class="modal-body">
+    <p><strong>Username:</strong> {{ user.username }}</p>
+    <p><strong>Role:</strong> {{ user.role|title }}</p>
+    <p><strong>Joined:</strong> {{ user.created_at|date:"Y-m-d H:i" }}</p>
+    <p><strong>Status:</strong> {{ user.verification_status }}</p>
+
+    {% if user.verified_by %}
+        <p><strong>Verified By:</strong> {{ user.verified_by.username }}</p>
+    {% endif %}
+
+    {% if user.id_document %}
+        <p><strong>ID Document:</strong></p>
+        <a href="{{ user.id_document.url }}" target="_blank" class="btn btn-sm btn-info">View Document</a>
+    {% else %}
+        <p class="text-muted">No document uploaded.</p>
+    {% endif %}
+</div>
+
+<div class="modal-footer">
+    <button hx-post="{% url 'admin_manage_user' user.id 'verify' %}"
+            hx-target="#users-table-body"
+            hx-swap="innerHTML"
+            class="btn btn-success btn-sm">Approve</button>
+
+    <button hx-post="{% url 'admin_manage_user' user.id 'suspend' %}"
+            hx-target="#users-table-body"
+            hx-swap="innerHTML"
+            class="btn btn-warning btn-sm">Suspend</button>
+
+    <button hx-post="{% url 'admin_manage_user' user.id 'delete' %}"
+            hx-target="#users-table-body"
+            hx-swap="innerHTML"
+            class="btn btn-danger btn-sm">Delete</button>
+</div>

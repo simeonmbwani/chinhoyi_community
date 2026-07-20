@@ -1,0 +1,74 @@
+<div class="card shadow-sm rounded-4"
+     hx-get="{% url 'dashboard:messages_partial' %}"
+     hx-trigger="load, every 15s"
+     hx-target="this"
+     hx-swap="outerHTML">
+
+    <div class="card-header bg-secondary text-white d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">📩 My Messages</h5>
+        {% if messages_unread_count > 0 %}
+            <span class="badge bg-danger">{{ messages_unread_count }} new</span>
+        {% endif %}
+    </div>
+
+    <!-- Scrollable body to avoid clutter -->
+    <div style="max-height: 400px; overflow-y: auto; -webkit-overflow-scrolling: touch;">
+        {% for group in messages_by_room %}
+            <div class="card-body border-bottom">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <div class="text-truncate" style="max-width: 70%;">
+                        <strong>Room #{{ group.room.id }}</strong>
+                        {% if group.listing %}
+                            <span class="badge bg-info ms-2">{{ group.listing.product_name }}</span>
+                        {% endif %}
+                        {% if group.unread_count > 0 %}
+                            <span class="badge bg-danger ms-2">{{ group.unread_count }} new</span>
+                        {% endif %}
+                    </div>
+                    <a href="{% url 'messaging:chat_room' group.room.id %}" class="btn btn-sm btn-success">
+                        💬 Open Chat
+                    </a>
+                </div>
+
+                <ul class="list-group list-group-flush">
+                    {% for msg in group.messages|slice:":5" %}
+                        <li class="list-group-item {% if msg.sender == user %}text-end{% endif %}">
+                            <div class="d-inline-block px-3 py-2 rounded position-relative"
+                                 style="background:{% if msg.sender == user %}#dcf8c6{% else %}#fff{% endif %}; color:#000; max-width: 85%;">
+                                <strong>
+                                    {% if msg.sender == user %}You{% else %}{{ msg.sender.username }}{% endif %}
+                                </strong>
+                                <p class="mb-0 text-truncate">{{ msg.content }}</p>
+                                {% if msg.file %}
+                                    <a href="{{ msg.file.url }}" target="_blank" class="d-block text-primary">📎 Attachment</a>
+                                {% endif %}
+                                <div class="text-end">
+                                    <small class="text-muted">{{ msg.timestamp|date:"Y-m-d H:i" }}</small>
+                                    {% if msg.sender == user %}
+                                        <span class="tick {% if msg.status == 'read' %}read{% elif msg.status == 'delivered' %}delivered{% else %}sent{% endif %}"></span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </li>
+                    {% empty %}
+                        <li class="list-group-item text-center text-muted">No messages yet.</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% empty %}
+            <div class="card-body text-center text-muted">No active conversations.</div>
+        {% endfor %}
+    </div>
+</div>
+
+<style>
+/* Tick styles */
+.tick { font-size: 0.9em; margin-left: 4px; }
+.tick.sent::after { content: "✓"; color: gray; }
+.tick.delivered::after { content: "✓✓"; color: gray; }
+.tick.read::after { content: "✓✓"; color: #34b7f1; }
+
+/* Hover effect for desktop, smooth scroll for Android */
+.list-group-item { transition: background-color 0.2s ease-in-out; }
+.list-group-item:hover { background-color: #f8f9fa; }
+</style>

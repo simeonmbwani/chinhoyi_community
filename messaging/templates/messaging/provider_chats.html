@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-4">
+    <h2>My Conversations</h2>
+    <ul class="list-group shadow-sm">
+        {% for room in rooms %}
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                <div>
+                    <strong>Room #{{ room.id }}</strong>
+                    <p class="small text-muted mb-0">
+                        Last message: {{ room.messages.last.content|truncatewords:10 }}
+                    </p>
+                </div>
+                <a href="{% url 'messaging:chat_room' room.id %}" class="btn btn-sm btn-success">Open Chat</a>
+            </li>
+        {% empty %}
+            <li class="list-group-item text-center">No conversations found.</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}

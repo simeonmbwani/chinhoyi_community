@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-5">
+    <h2>Marketplace Audit Control</h2>
+    
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <h4>Recent Activity Log</h4>
+            <table class="table table-hover bg-white shadow-sm">
+                <thead class="table-dark">
+                    <tr><th>Customer</th><th>Listing</th><th>Type</th><th>Status</th></tr>
+                </thead>
+                <tbody>
+                    {% for booking in recent_bookings %}
+                    <tr>
+                        <td>{{ booking.customer.username }}</td>
+                        <td>{{ booking.listing.title }}</td>
+                        <td>{{ booking.request_type|title }}</td>
+                        <td>
+                            <span class="badge {% if booking.status == 'pending' %}bg-warning{% else %}bg-info{% endif %}">
+                                {{ booking.status }}
+                            </span>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

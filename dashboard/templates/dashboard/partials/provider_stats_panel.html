@@ -1,0 +1,22 @@
+<div class="card shadow-sm rounded-4">
+    <div class="card-header bg-dark text-white">
+        <h5 class="mb-0">Provider Overview</h5>
+    </div>
+    <div class="card-body">
+        <p>Total Listings: <strong>{{ listings_count }}</strong>
+            <a href="{% url 'listings:provider_listings' %}" class="small ms-2">View All</a>
+        </p>
+        <p>Pending Verification: <strong>{{ pending_listings_count }}</strong></p>
+        <p>Suspended/Deleted: <strong>{{ suspended_listings_count }}</strong></p>
+        <p>Bookings Notifications: <strong>{{ provider_bookings_count }}</strong>
+            <a href="{% url 'dashboard:provider_bookings' %}" class="small ms-2">View All</a>
+        </p>
+        <p>Reviews & Feedback: <strong>{{ provider_reviews_count }}</strong>
+            <a href="{% url 'dashboard:provider_reviews' %}" class="small ms-2">View All</a>
+        </p>
+        <p>Updates: <strong>{{ provider_updates_count }}</strong></p>
+
+        <!-- ✅ Chats link added here -->
+        <p>Chats: <a href="{% url 'dashboard:dashboard_chats' %}" class="small ms-2">Open Conversations</a></p>
+    </div>
+</div>

@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% block content %}
+<div class="container mt-5">
+    <div class="card shadow-lg border-0 rounded-4 p-4">
+        <h2 class="text-primary fw-bold text-center mb-4">
+            🌍 {% trans "About Chinhoyi Community" %}
+        </h2>
+
+        <!-- Mission Statement -->
+        <div class="mb-4 text-center">
+            <p class="lead text-muted">
+                {% trans "The Chinhoyi Community platform is dedicated to bridging the gap between service providers and residents." %}
+            </p>
+            <p class="text-secondary">
+                {% trans "Our mission is to facilitate easy access to property, equipment, and essential services within our local area." %}
+            </p>
+        </div>
+
+        <!-- Highlights Section -->
+        <div class="row text-center mt-4">
+            <div class="col-md-4 mb-3">
+                <div class="p-3 bg-light rounded shadow-sm h-100">
+                    <h5 class="fw-bold">🤝 {% trans "Connecting People" %}</h5>
+                    <p class="small text-muted">
+                        {% trans "Directly link service providers with residents, eliminating middlemen." %}
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="p-3 bg-light rounded shadow-sm h-100">
+                    <h5 class="fw-bold">🏠 {% trans "Local Empowerment" %}</h5>
+                    <p class="small text-muted">
+                        {% trans "Keep resources circulating within Chinhoyi, strengthening community businesses." %}
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="p-3 bg-light rounded shadow-sm h-100">
+                    <h5 class="fw-bold">💡 {% trans "Innovation" %}</h5>
+                    <p class="small text-muted">
+                        {% trans "Modern tools for listings, payments, and communication built for mobile-first users." %}
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Call to Action -->
+        <div class="text-center mt-5">
+            <a href="{% url 'listings:list_listings' %}" class="btn btn-success btn-lg shadow-sm">
+                🚀 {% trans "Explore the Marketplace" %}
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

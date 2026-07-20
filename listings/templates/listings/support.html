@@ -1,0 +1,145 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="card shadow-lg border-0 rounded-4 p-4">
+                <h2 class="mb-4 text-primary fw-bold text-center">
+                    🛠️ {% trans "Support & Contact" %}
+                </h2>
+                <p class="text-muted text-center">
+                    {% trans "Need help or have feedback? We are here to assist you." %}
+                </p>
+
+                <!-- Accordion for Support Sections -->
+                <div class="accordion mt-4" id="supportAccordion">
+                    <!-- Contact Information -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingContact">
+                            <button class="accordion-button fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#collapseContact">
+                                📞 {% trans "Contact Information" %}
+                            </button>
+                        </h2>
+                        <div id="collapseContact" class="accordion-collapse collapse show" data-bs-parent="#supportAccordion">
+                            <div class="accordion-body">
+                                <ul class="list-unstyled">
+                                    <li class="mb-2">
+                                        <strong>WhatsApp/Calls:</strong> 
+                                        <a href="tel:+263775493710" class="text-decoration-none">+263 775 493 710</a> / 
+                                        <a href="tel:+263786120826" class="text-decoration-none">+263 786 120 826</a>
+                                    </li>
+                                    <li>
+                                        <strong>Email:</strong> 
+                                        <a href="mailto:simeonmbwani@gmail.com" class="text-decoration-none">simeonmbwani@gmail.com</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Report an Issue -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingIssue">
+                            <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#collapseIssue">
+                                ⚠️ {% trans "Report an Issue" %}
+                            </button>
+                        </h2>
+                        <div id="collapseIssue" class="accordion-collapse collapse" data-bs-parent="#supportAccordion">
+                            <div class="accordion-body">
+                                <p class="text-muted">
+                                    {% trans "For payment issues, please include your" %} 
+                                    <strong>{% trans "Transaction Reference ID" %}</strong>.
+                                </p>
+                                <a href="{% url 'listings:support_ticket' %}" class="btn btn-outline-primary btn-sm">
+                                    📝 {% trans "Submit a Support Ticket" %}
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Feedback -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingFeedback">
+                            <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFeedback">
+                                💡 {% trans "Feedback & Suggestions" %}
+                            </button>
+                        </h2>
+                        <div id="collapseFeedback" class="accordion-collapse collapse" data-bs-parent="#supportAccordion">
+                            <div class="accordion-body">
+                                <p class="text-muted">
+                                    {% trans "We value your input! Share your ideas to help us improve the platform." %}
+                                </p>
+                                <a href="{% url 'listings:feedback' %}" class="btn btn-outline-success btn-sm">
+                                    ✨ {% trans "Give Feedback" %}
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Footer Note -->
+                <div class="text-center mt-4">
+                    <p class="small text-muted">
+                        📌 {% trans "Our support team typically responds within 24 hours." %}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Live Chat Widget -->
+<div id="chat-widget" class="card shadow-lg border-0 rounded-4" 
+     style="position: fixed; bottom: 20px; right: 20px; width: 300px; display: none; z-index: 999;">
+    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+        <span>💬 {% trans "Live Support Chat" %}</span>
+        <button class="btn btn-sm btn-light" onclick="toggleChat()">✖</button>
+    </div>
+    <div class="card-body p-2" style="height: 250px; overflow-y: auto;" id="chat-log">
+        <p class="text-muted small">{% trans "Welcome! How can we assist you today?" %}</p>
+    </div>
+    <div class="card-footer p-2">
+        <form id="chat-form" class="d-flex">
+            <input type="text" id="chat-input" class="form-control form-control-sm me-2" placeholder="{% trans 'Type a message...' %}">
+            <button type="submit" class="btn btn-sm btn-primary">Send</button>
+        </form>
+    </div>
+</div>
+
+<!-- Floating Chat Button -->
+<button id="chat-toggle-btn" class="btn btn-primary rounded-circle shadow-lg" 
+        style="position: fixed; bottom: 20px; right: 20px; width: 60px; height: 60px; z-index: 998;"
+        onclick="toggleChat()">💬</button>
+
+<script>
+    function toggleChat() {
+        const widget = document.getElementById("chat-widget");
+        const btn = document.getElementById("chat-toggle-btn");
+        if (widget.style.display === "none") {
+            widget.style.display = "block";
+            btn.style.display = "none";
+        } else {
+            widget.style.display = "none";
+            btn.style.display = "block";
+        }
+    }
+
+    document.getElementById("chat-form").onsubmit = function(e) {
+        e.preventDefault();
+        const input = document.getElementById("chat-input");
+        const log = document.getElementById("chat-log");
+        if (input.value.trim() !== "") {
+            log.innerHTML += `<div class="p-2 mb-1 bg-light rounded text-dark">${input.value}</div>`;
+            input.value = "";
+            log.scrollTop = log.scrollHeight;
+            // Simulated support response
+            setTimeout(() => {
+                log.innerHTML += `<div class="p-2 mb-1 bg-primary text-white rounded">Support: Sorry, our team are currently busy, they will get back to you shortly..</div>`;
+                log.scrollTop = log.scrollHeight;
+            }, 1500);
+        }
+    };
+</script>
+{% endblock %}

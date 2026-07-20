@@ -1,0 +1,6 @@
+<div class="card bg-primary text-white p-3 shadow-sm rounded-4">
+    <h5>Wallet Balance</h5>
+    <h3 class="mb-0">${{ wallet.balance|default:"0.00" }}</h3>
+    <p class="small mt-2">Track your earnings and spending</p>
+    <a href="{% url 'accounts:wallet' %}" class="btn btn-light btn-sm mt-2">Manage Wallet</a>
+</div>

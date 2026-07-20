@@ -1,0 +1,56 @@
+<div class="card shadow-sm rounded-4">
+    <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">💬 My Conversations</h5>
+        <span class="badge bg-secondary">{{ rooms.count }} total</span>
+    </div>
+
+    <!-- Scrollable list for mobile -->
+    <div class="list-group list-group-flush" style="max-height: 400px; overflow-y: auto;">
+        {% for room in rooms %}
+            <a href="{% url 'messaging:chat_room' room.id %}"
+               class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                <div class="text-truncate" style="max-width: 70%;">
+                    {% if room.listing %}
+                        <strong>{{ room.listing.product_name }}</strong><br>
+                    {% endif %}
+                    <small class="text-muted d-block text-truncate">
+                        {% if room.messages.last %}
+                            {{ room.messages.last.content|truncatewords:10 }}
+                            <span class="ms-2 text-secondary">
+                                {{ room.messages.last.timestamp|date:"M d, H:i" }}
+                            </span>
+                        {% else %}
+                            No messages yet
+                        {% endif %}
+                    </small>
+                </div>
+                <div class="text-end">
+                    {% if room.unread_count %}
+                        <span class="badge bg-danger me-2">{{ room.unread_count }}</span>
+                    {% endif %}
+                    <span class="badge bg-success">Open</span>
+                </div>
+            </a>
+        {% empty %}
+            <div class="list-group-item text-center text-muted">
+                🚀 No conversations found. Start chatting from a listing!
+            </div>
+        {% endfor %}
+    </div>
+</div>
+
+<style>
+/* Smooth scrolling for Android feel */
+.list-group {
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Hover effect for desktop, tap-friendly spacing for mobile */
+.list-group-item {
+    transition: background-color 0.2s ease-in-out;
+    padding: 0.75rem 1rem;
+}
+.list-group-item:hover {
+    background-color: #f8f9fa;
+}
+</style>

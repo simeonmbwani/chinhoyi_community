@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container-fluid p-0" style="height:100vh; display:flex; flex-direction:column;">
+    <!-- Header -->
+    <div class="bg-success text-white p-2 d-flex justify-content-between align-items-center">
+        <strong>
+            {% for participant in room.participants.all %}
+                {% if participant != user %}
+                    {{ participant.username }}
+                {% endif %}
+            {% endfor %}
+        </strong>
+        {% if unread_count > 0 %}
+            <span class="badge bg-warning text-dark">🔔 {{ unread_count }} unread</span>
+        {% endif %}
+    </div>
+
+    <!-- Messages -->
+    <div id="chatBox" class="flex-grow-1 p-3" style="overflow-y:auto; background:#ece5dd;">
+        {% for msg in messages %}
+            <div class="message-bubble {% if msg.sender == user %}sent{% else %}received{% endif %}">
+                <div class="message-header">
+                    <small class="sender-name">
+                        {% if msg.sender == user %}
+                            You
+                        {% else %}
+                            {{ msg.sender.username }}
+                        {% endif %}
+                    </small>
+                </div>
+                <div class="message-content">
+                    {% if msg.content %}{{ msg.content }}{% endif %}
+                    {% if msg.file %}
+                        <a href="{{ msg.file.url }}" target="_blank" class="attachment">📎 Attachment</a>
+                    {% endif %}
+                </div>
+                <div class="message-footer">
+                    <small class="timestamp">{{ msg.timestamp|date:"H:i" }}</small>
+                    {% if msg.sender == user %}
+                        <span class="tick {% if msg.status == 'read' %}read{% elif msg.status == 'delivered' %}delivered{% else %}sent{% endif %}"></span>
+                    {% endif %}
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+
+    <!-- Input -->
+    <div class="p-2 bg-light">
+        <form id="chatForm" method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="input-group">
+                <button type="button" class="btn btn-light" onclick="document.getElementById('fileInput').click()">📎</button>
+                <input type="file" id="fileInput" name="file" class="d-none">
+                <button type="button" id="micBtn" class="btn btn-light">🎤</button>
+                <input type="text" name="message" id="chatInput" class="form-control" placeholder="Type a message...">
+                <button class="btn btn-success" type="submit">Send</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+.message-bubble {
+    max-width: 75%;
+    padding: 8px 12px;
+    margin: 6px;
+    border-radius: 8px;
+    font-size: 14px;
+}
+.message-bubble.sent {
+    background: #dcf8c6; /* WhatsApp green */
+    margin-left: auto;
+    text-align: right;
+}
+.message-bubble.received {
+    background: #fff; /* WhatsApp white */
+    margin-right: auto;
+    text-align: left;
+}
+.message-header {
+    font-size: 11px;
+    color: #555;
+    margin-bottom: 2px;
+}
+.message-content { color: #000; }
+.attachment { display: block; color: #007bff; margin-top: 4px; }
+.message-footer { font-size: 11px; color: #777; margin-top: 4px; }
+.tick { font-size: 0.9em; margin-left: 4px; }
+.tick.sent::after { content: "✓"; color: gray; }
+.tick.delivered::after { content: "✓✓"; color: gray; }
+.tick.read::after { content: "✓✓"; color: #34b7f1; } /* WhatsApp blue */
+</style>
+
+<script>
+const chatForm = document.getElementById("chatForm");
+const chatBox = document.getElementById("chatBox");
+
+chatForm.addEventListener("submit", function(e) {
+    e.preventDefault();
+    const formData = new FormData(chatForm);
+
+    fetch("{% url 'messaging:send_message' room.id %}", {
+        method: "POST",
+        body: formData,
+        headers: { "X-Requested-With": "XMLHttpRequest" }
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            const msgDiv = document.createElement("div");
+            msgDiv.classList.add("message-bubble", "sent");
+            msgDiv.innerHTML = `
+                <div class="message-header"><small class="sender-name">You</small></div>
+                <div class="message-content">
+                    ${data.content}
+                    ${data.file_url ? `<a href="${data.file_url}" target="_blank" class="attachment">📎 Attachment</a>` : ""}
+                </div>
+                <div class="message-footer">
+                    <small class="timestamp">${data.timestamp}</small>
+                    <span class="tick sent"></span>
+                </div>
+            `;
+            chatBox.appendChild(msgDiv);
+            chatBox.scrollTop = chatBox.scrollHeight;
+            chatForm.reset();
+        }
+    });
+});
+
+document.getElementById("micBtn").onclick = () => alert("🎤 Voice recording initialized...");
+</script>
+{% endblock %}

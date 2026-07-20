@@ -1,0 +1,37 @@
+<table class="table table-sm table-striped">
+  <thead>
+    <tr>
+      <th>Customer</th>
+      <th>Provider</th>
+      <th>Listing</th>
+      <th>Status</th>
+      <th>Fare Paid</th>
+      <th>Reference #</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for booking in all_bookings %}
+    <tr>
+      <td>{{ booking.customer.username }}</td>
+      <td>{{ booking.listing.user.username }}</td>
+      <td>{{ booking.listing.title }}</td>
+      <td>{{ booking.status }}</td>
+      <td>${{ booking.fare }}</td>
+      <td>{{ booking.reference_number }}</td>
+      <td>
+        <button hx-post="{% url 'admin_manage_booking' booking.id 'approve' %}"
+                hx-target="#bookings-table-body"
+                hx-swap="innerHTML"
+                class="btn btn-success btn-sm">Approve</button>
+        <button hx-post="{% url 'admin_manage_booking' booking.id 'cancel' %}"
+                hx-target="#bookings-table-body"
+                hx-swap="innerHTML"
+                class="btn btn-danger btn-sm">Cancel</button>
+      </td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="7" class="text-muted">No bookings found.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>

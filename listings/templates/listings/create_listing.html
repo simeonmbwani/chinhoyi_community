@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="card p-4 shadow-lg mx-auto rounded-4" style="max-width: 650px;">
+    <h3 class="mb-4 text-primary text-center">Create New Listing</h3>
+    <p class="text-muted text-center small mb-4">Post your service or product directly to the Chinhoyi Community Marketplace.</p>
+    
+    <!-- Error Handling -->
+    {% if form.errors %}
+        <div class="alert alert-danger fade show" role="alert" id="form-error">
+            <strong>Oops!</strong> Please check your entries. Ensure the image is a valid format.
+        </div>
+    {% endif %}
+
+    <form method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+        {% csrf_token %}
+        {% for field in form %}
+        <div class="mb-3">
+            <label class="form-label fw-bold">{{ field.label }}</label>
+            {{ field }}
+            {% if field.help_text %}
+                <small class="text-muted d-block">{{ field.help_text }}</small>
+            {% endif %}
+            {% if field.errors %}
+                <div class="text-danger small mt-1">
+                    {{ field.errors|striptags }}
+                </div>
+            {% endif %}
+        </div>
+        {% endfor %}
+
+        <!-- Image Preview -->
+        <div class="mb-3">
+            <label class="form-label fw-bold">Image Preview</label>
+            <div id="image-preview" class="border rounded p-3 text-center text-muted">
+                No image selected yet.
+            </div>
+        </div>
+        
+        <!-- Action Buttons -->
+        <button type="submit" class="btn btn-primary w-100 btn-lg mt-3">🚀 Post to Marketplace</button>
+        <a href="{% url 'dashboard:dashboard' %}" class="btn btn-outline-secondary w-100 mt-2 text-decoration-none">Cancel</a>
+    </form>
+</div>
+
+<script>
+    // Auto-hide error alert after 5 seconds
+    document.addEventListener("DOMContentLoaded", function() {
+        const errorAlert = document.getElementById("form-error");
+        if (errorAlert) {
+            setTimeout(() => {
+                errorAlert.classList.remove("show");
+                errorAlert.classList.add("fade");
+                setTimeout(() => errorAlert.remove(), 500);
+            }, 5000);
+        }
+
+        // Image preview logic
+        const fileInputs = document.querySelectorAll('input[type="file"]');
+        const previewBox = document.getElementById("image-preview");
+
+        fileInputs.forEach(input => {
+            input.addEventListener("change", function() {
+                const file = this.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        previewBox.innerHTML = `<img src="${e.target.result}" 
+                            alt="Preview" class="img-fluid rounded shadow-sm" 
+                            style="max-height: 250px;">`;
+                    };
+                    reader.readAsDataURL(file);
+                } else {
+                    previewBox.innerHTML = "No image selected yet.";
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}

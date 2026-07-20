@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="card shadow-lg border-0 rounded-4 p-4">
+                <h2 class="mb-4 text-primary fw-bold text-center">
+                    📜 {% trans "Terms & Conditions" %}
+                </h2>
+
+                <!-- Accordion for Terms -->
+                <div class="accordion" id="termsAccordion">
+                    <!-- User Conduct -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingOne">
+                            <button class="accordion-button fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne">
+                                1. {% trans "User Conduct" %}
+                            </button>
+                        </h2>
+                        <div id="collapseOne" class="accordion-collapse collapse show" data-bs-parent="#termsAccordion">
+                            <div class="accordion-body">
+                                <p>✅ Users must provide accurate information. Fraudulent listings, impersonation, or misuse of the platform will result in immediate account termination.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Rental Responsibility -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingTwo">
+                            <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo">
+                                2. {% trans "Rental Responsibility" %}
+                            </button>
+                        </h2>
+                        <div id="collapseTwo" class="accordion-collapse collapse" data-bs-parent="#termsAccordion">
+                            <div class="accordion-body">
+                                <p>🏠 The platform acts as an intermediary. All rental agreements are between the Provider and the Renter. We are not liable for the condition of items.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Payment & Auditing -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingThree">
+                            <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree">
+                                3. {% trans "Payment & Auditing" %}
+                            </button>
+                        </h2>
+                        <div id="collapseThree" class="accordion-collapse collapse" data-bs-parent="#termsAccordion">
+                            <div class="accordion-body">
+                                <p>💳 All service fees are non-refundable. Users must submit a valid EcoCash Transaction Reference ID to activate listings. Payment confirmation is subject to audit.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Dispute Resolution -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingFour">
+                            <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour">
+                                4. {% trans "Dispute Resolution" %}
+                            </button>
+                        </h2>
+                        <div id="collapseFour" class="accordion-collapse collapse" data-bs-parent="#termsAccordion">
+                            <div class="accordion-body">
+                                <p>⚖️ In the event of a disagreement, users should first attempt to resolve it directly. If unresolved, contact our support team with your transaction reference.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Footer Note -->
+                <div class="text-center mt-4">
+                    <p class="small text-muted">
+                        📌 {% trans "By using this platform, you agree to abide by these terms and conditions." %}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,141 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4">Welcome!, Mauya, Siyamukhela, {{ user.username }}</h2>
+
+    <!-- Notifications Panel -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            {% include "dashboard/partials/notifications_panel.html" %}
+        </div>
+    </div>
+
+    <!-- Wallet Overview -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            {% include "dashboard/partials/wallet_panel.html" %}
+        </div>
+    </div>
+
+    <!-- Messages Section -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card shadow-sm rounded-4">
+                <div class="card-header bg-secondary text-white d-flex justify-content-between align-items-center"
+                     data-bs-toggle="collapse" data-bs-target="#messagesCollapse" aria-expanded="false" aria-controls="messagesCollapse">
+                    <h5 class="mb-0">My Messages</h5>
+                    {% if messages_unread_count > 0 %}
+                        <span class="badge bg-danger">{{ messages_unread_count }} new</span>
+                    {% endif %}
+                </div>
+                <div id="messagesCollapse" class="collapse">
+                    {% include "dashboard/partials/messages_panel.html" %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Role-specific dashboards -->
+    <div class="row">
+        {% if user.role == "provider" %}
+            <div class="col-md-12">
+                <div class="card shadow-sm rounded-4"
+                     hx-get="{% url 'dashboard:provider_stats_partial' %}"
+                     hx-trigger="load, every 20s"
+                     hx-target="this"
+                     hx-swap="outerHTML">
+                    <div class="card-header bg-dark text-white">
+                        <h5 class="mb-0">Provider Overview</h5>
+                    </div>
+                  <div class="card-body">
+    <p>Total Listings: <strong>{{ listings_count }}</strong>
+        <a href="{% url 'listings:provider_listings' %}" class="small ms-2">View All</a>
+    </p>
+    <p>Bookings Notifications: <strong>{{ provider_bookings_count }}</strong>
+        <a href="{% url 'dashboard:provider_bookings' %}" class="small ms-2">View All</a>
+    </p>
+    <p>Reviews & Feedback: <strong>{{ provider_reviews_count }}</strong>
+        <a href="{% url 'dashboard:provider_reviews' %}" class="small ms-2">View All</a>
+    </p>
+    <p>Chats: <a href="{% url 'messaging:provider_chats' %}" class="small ms-2">Open Conversations</a></p>
+      
+</div>
+</div>
+                <!-- Post Listing Button -->
+                {% if user.is_verified %}
+                    {% if user.is_paid %}
+                        <a href="{% url 'listings:create_listing' %}" class="btn btn-primary mt-3">
+                            ➕ List Product/Service
+                        </a>
+                    {% else %}
+                        <button class="btn btn-secondary mt-3" disabled>
+                            ➕ List Product/Service
+                        </button>
+                        <small class="text-muted d-block mt-1">
+                            Payment required before posting. Please complete payment and await admin confirmation.
+                        </small>
+                    {% endif %}
+                {% else %}
+                    <button class="btn btn-secondary mt-3" disabled>
+                        ➕ List Product/Service
+                    </button>
+                    <small class="text-muted d-block mt-1">
+                        Awaiting admin approval.
+                    </small>
+                {% endif %}
+            </div>
+        {% elif user.role == "buyer" %}
+            <div class="col-md-12">
+                <div class="card shadow-sm rounded-4"
+                     hx-get="{% url 'dashboard:buyer_stats_partial' %}"
+                     hx-trigger="load, every 20s"
+                     hx-target="this"
+                     hx-swap="outerHTML">
+                    <div class="card-header bg-dark text-white">
+                        <h5 class="mb-0">Buyer Overview</h5>
+                    </div>
+                    <div class="card-body">
+                        <p>Upcoming Bookings: <strong>{{ upcoming_bookings_count }}</strong></p>
+                        <p>Unread Messages: <strong>{{ messages_unread_count }}</strong></p>
+                        <p>Reviews Given: <strong>{{ buyer_reviews_count }}</strong></p>
+                        <p>Feedback Received: <strong>{{ buyer_feedback_count }}</strong></p>
+                        <p>Updates: <strong>{{ buyer_updates_count }}</strong></p>
+                    </div>
+                </div>
+
+                <!-- Bookings List -->
+                <div class="card shadow-sm rounded-4 mt-4">
+                    <div class="card-header bg-info text-white d-flex justify-content-between align-items-center"
+                         data-bs-toggle="collapse" data-bs-target="#bookingsCollapse" aria-expanded="false" aria-controls="bookingsCollapse">
+                        <h3 class="mb-0">My Bookings & Appointments</h3>
+                    </div>
+                    <div id="bookingsCollapse" class="collapse">
+                        <ul class="list-group shadow-sm">
+                            {% for booking in my_bookings|slice:":5" %}
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <strong>{{ booking.listing.product_name }}</strong> 
+                                        <span class="badge bg-info ms-2">{{ booking.status }}</span>
+                                        <p class="small text-muted mb-0">Scheduled: {{ booking.date|date:"Y-m-d H:i" }}</p>
+                                    </div>
+                                    <div class="d-print-none">
+                                        <a href="{% url 'dashboard:cancel_booking' booking.id %}" class="btn btn-sm btn-danger">Cancel</a>
+                                        {% if booking.listing.user %}
+                                            <a href="{% url 'messaging:message_provider' booking.listing.user.id %}" class="btn btn-sm btn-primary">Message</a>
+                                        {% endif %}
+                                    </div>
+                                </li>
+                            {% empty %}
+                                <li class="list-group-item text-center">No bookings found.</li>
+                            {% endfor %}
+                        </ul>
+                        <div class="text-center mt-2">
+                            <a href="{% url 'dashboard:all_bookings' %}" class="small">View All</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

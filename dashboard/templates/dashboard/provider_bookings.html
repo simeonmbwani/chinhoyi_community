@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-4">
+    <h2>My Bookings & Appointments</h2>
+    <table class="table table-striped shadow-sm">
+        <thead>
+            <tr>
+                <th>Product/Service</th>
+                <th>Status</th>
+                <th>Scheduled Date</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for booking in bookings %}
+                <tr>
+                    <td>{{ booking.listing.product_name }}</td>
+                    <td><span class="badge bg-info">{{ booking.status }}</span></td>
+                    <td>{{ booking.date|date:"Y-m-d H:i" }}</td>
+                    <td>
+                        <a href="{% url 'dashboard:cancel_booking' booking.id %}" class="btn btn-sm btn-danger">Cancel</a>
+                        <a href="{% url 'messaging:message_provider' booking.listing.user.id %}" class="btn btn-sm btn-primary">Message</a>
+                    </td>
+                </tr>
+            {% empty %}
+                <tr><td colspan="4" class="text-center">No bookings found.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

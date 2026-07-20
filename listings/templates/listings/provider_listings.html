@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-4">
+    <h2>My Listings</h2>
+    <table class="table table-striped shadow-sm">
+        <thead>
+            <tr>
+                <th>Product/Service</th>
+                <th>Status</th>
+                <th>Created</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for listing in listings %}
+                <tr>
+                    <td>{{ listing.product_name }}</td>
+                    <td><span class="badge bg-info">{{ listing.status }}</span></td>
+                    <td>{{ listing.created_at|date:"Y-m-d H:i" }}</td>
+                    <td>
+                        <a href="{% url 'listings:edit_listing' listing.id %}" class="btn btn-sm btn-warning">Edit</a>
+                        <a href="{% url 'listings:delete_listing' listing.id %}" class="btn btn-sm btn-danger">Delete</a>
+                    </td>
+                </tr>
+            {% empty %}
+                <tr><td colspan="4" class="text-center">No listings found.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

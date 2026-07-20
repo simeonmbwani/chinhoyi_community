@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-4">
+    <h2>Reviews & Feedback</h2>
+    <ul class="list-group shadow-sm">
+        {% for review in reviews %}
+            <li class="list-group-item">
+                <strong>{{ review.user.username }}</strong> rated 
+                <span class="badge bg-warning">{{ review.rating }}/5</span>
+                <p class="mb-0">{{ review.comment }}</p>
+                <small class="text-muted">{{ review.created_at|date:"Y-m-d H:i" }}</small>
+            </li>
+        {% empty %}
+            <li class="list-group-item text-center">No reviews yet.</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}

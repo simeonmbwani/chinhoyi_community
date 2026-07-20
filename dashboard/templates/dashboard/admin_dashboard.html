@@ -1,0 +1,198 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-4" id="admin-audit-section">
+    <div class="d-flex justify-content-between align-items-center mb-4 d-print-none">
+        <h2>📊 Admin Oversight Dashboard</h2>
+        <button onclick="window.print()" class="btn btn-secondary">🖨️ Print Audit Report</button>
+    </div>
+
+    <!-- User & Compliance Audit -->
+    <div class="card shadow-sm rounded-4 mb-4"
+         hx-get="{% url 'dashboard:admin_users_partial' %}"
+         hx-trigger="every 10s"
+         hx-target="#users-table-body"
+         hx-swap="innerHTML">
+        <div class="card-header bg-dark text-white">
+            <h4 class="mb-0">👥 User & Compliance Audit</h4>
+        </div>
+        <div class="table-responsive" style="max-height: 400px; overflow-y:auto; -webkit-overflow-scrolling:touch;">
+            <div id="users-table-body">
+                {% include 'dashboard/partials/users_table.html' %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Real-Time Activity Log -->
+    <div class="card shadow-sm rounded-4 mb-4"
+         hx-get="{% url 'dashboard:admin_logs_partial' %}"
+         hx-trigger="every 5s"
+         hx-target="#logs-table-body"
+         hx-swap="innerHTML">
+        <div class="card-header bg-info text-white">
+            <h4 class="mb-0">📜 Real-Time Activity Log</h4>
+        </div>
+        <div class="table-responsive" style="max-height: 400px; overflow-y:auto; -webkit-overflow-scrolling:touch;">
+            <div id="logs-table-body">
+                {% include 'dashboard/partials/logs_table.html' %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Summary Metrics -->
+    <div class="row mb-4 text-center">
+        <div class="col-md-3 col-sm-6 mb-3">
+            <div class="card p-3 shadow-sm">
+                <h6 class="text-muted">Total Listings</h6>
+                <h4 id="total-listings" class="fw-bold">{{ total_listings }}</h4>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6 mb-3">
+            <div class="card p-3 shadow-sm">
+                <h6 class="text-muted">Total Users</h6>
+                <h4 id="total-users" class="fw-bold">{{ total_users }}</h4>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6 mb-3">
+            <div class="card p-3 shadow-sm">
+                <h6 class="text-muted">Total Market Value</h6>
+                <h4 id="total-market" class="fw-bold">${{ total_market|default:"0.00" }}</h4>
+            </div>  
+        </div>
+    <div class="col-md-3 col-sm-6 mb-3">
+        <div class="card p-3 shadow-sm">
+            <h6 class="text-muted">Total Service Fees Collected</h6>
+            <h4 class="fw-bold">${{ total_service_fees|default:"0.00" }}</h4>
+        </div>
+    </div>
+</div>
+        <!-- 💳 Recent Transactions -->
+<div class="card shadow-sm rounded-4 mb-4"
+     hx-get="{% url 'dashboard:admin_transactions_partial' %}"
+     hx-trigger="every 10s"
+     hx-target="#transactions-table-body"
+     hx-swap="innerHTML">
+    <div class="card-header bg-dark text-white">
+        <h4 class="mb-0">💳 Recent Transactions</h4>
+    </div>
+    <div class="table-responsive" style="max-height: 300px; overflow-y:auto;">
+        <div id="transactions-table-body">
+            {% include 'dashboard/partials/transactions_table.html' %}
+        </div>
+    </div>
+</div>
+
+    </div>
+
+    <!-- Provider Payment Summary -->
+    <div class="row mb-4 text-center">
+        <div class="col-md-6 col-sm-6 mb-3">
+            <div class="card p-3 shadow-sm">
+                <h6 class="text-muted">Paid Providers</h6>
+                <h4 id="paid-providers" class="fw-bold text-success">{{ paid_providers }}</h4>
+            </div>
+        </div>
+        <div class="col-md-6 col-sm-6 mb-3">
+            <div class="card p-3 shadow-sm">
+                <h6 class="text-muted">Unpaid Providers</h6>
+                <h4 id="unpaid-providers" class="fw-bold text-danger">{{ unpaid_providers }}</h4>
+            </div>
+        </div>
+    </div>
+
+    <!-- Listings Oversight -->
+    <div class="card shadow-sm rounded-4 mb-4"
+         hx-get="{% url 'dashboard:admin_listings_partial' %}"
+         hx-trigger="every 10s"
+         hx-target="#listings-table-body"
+         hx-swap="innerHTML">
+        <div class="card-header bg-dark text-white">
+            <h4 class="mb-0">📦 Listings Oversight</h4>
+        </div>
+        <div class="table-responsive" style="max-height: 500px; overflow-y:auto; -webkit-overflow-scrolling:touch;">
+            <div id="listings-table-body">
+                {% include 'dashboard/partials/listings_table.html' %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Bookings Oversight -->
+    <div class="card shadow-sm rounded-4 mb-4"
+         hx-get="{% url 'dashboard:admin_bookings_partial' %}"
+         hx-trigger="every 10s"
+         hx-target="#bookings-table-body"
+         hx-swap="innerHTML">
+        <div class="card-header bg-dark text-white">
+            <h4 class="mb-0">📅 Bookings Oversight</h4>
+        </div>
+        <div class="table-responsive" style="max-height: 500px; overflow-y:auto; -webkit-overflow-scrolling:touch;">
+            <div id="bookings-table-body">
+                {% include 'dashboard/partials/bookings_table.html' %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Notifications Oversight -->
+    <div class="card shadow-sm rounded-4 mb-4">
+        <div class="card-header bg-info text-white">
+            <h4 class="mb-0">🔔 Notifications Oversight</h4>
+        </div>
+        <div class="table-responsive print-expand">
+            {% include 'dashboard/partials/notifications_table.html' %}
+        </div>
+    </div>
+
+    <!-- Print Footer -->
+    <div class="mt-5 text-center d-none d-print-block">
+        <hr>
+        <p class="small text-muted">
+            Generated on {{ now|date:"Y-m-d H:i" }} by Admin {{ request.user.username }}
+        </p>
+        <p class="small">Signature: __________________________</p>
+    </div>
+</div>
+
+<!-- Bootstrap Modal -->
+<div class="modal fade" id="verificationModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content" id="modal-body">
+      <!-- HTMX injects verification_modal.html here -->
+    </div>
+  </div>
+</div>
+
+<style>
+@media print {
+    .d-print-none { display: none !important; }
+    .print-expand { max-height: none !important; overflow: visible !important; }
+    .table-responsive { overflow: visible !important; }
+    .card { page-break-inside: avoid; }
+}
+
+/* Sticky headers for scrollable tables */
+.table-responsive thead.sticky-top {
+    top: 0;
+    z-index: 2;
+}
+
+/* Hover effect */
+.table-hover tbody tr:hover {
+    background-color: #f8f9fa;
+}
+</style>
+
+<script>
+    function refreshStats() {
+        fetch("{% url 'dashboard:admin_dashboard_stats' %}")
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById("total-listings").innerText = data.total_listings;
+                document.getElementById("total-users").innerText = data.total_users;
+                document.getElementById("total-market").innerText = "$" + (data.total_market || "0.00");
+                document.getElementById("total-fees").innerText = "$" + (data.total_fees_collected || "0.00");
+                document.getElementById("paid-providers").innerText = data.paid_providers;
+                document.getElementById("unpaid-providers").innerText = data.unpaid_providers;
+            });
+    }
+    setInterval(refreshStats, 60000);
+</script>
+{% endblock %}

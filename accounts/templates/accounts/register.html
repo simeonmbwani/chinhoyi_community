@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+{% block content %}
+{% if messages %}
+  {% for message in messages %}
+    <div class="alert alert-{{ message.tags }} fade show" role="alert">
+      {{ message }}
+    </div>
+  {% endfor %}
+{% endif %}
+
+<div class="row justify-content-center">
+    <div class="col-12 col-md-8 col-lg-5">
+        <div class="card shadow-lg border-0 rounded-4 p-4">
+            <h2 class="text-primary text-center mb-3">Join Chinhoyi Community</h2>
+            <p class="text-muted text-center small mb-4">Register to start connecting directly with locals.</p>
+            
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                
+                {% if form.non_field_errors %}
+                    <div class="alert alert-danger fade show" role="alert" id="error-alert">
+                        {% for error in form.non_field_errors %}
+                            <p class="mb-0">{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                {% for field in form %}
+                    <div class="mb-3">
+                        {{ field.label_tag }}
+                        {{ field }}
+                        {% if field.errors %}
+                            <div class="text-danger small mt-1">
+                                {{ field.errors|striptags }}
+                            </div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+                
+                <button type="submit" class="btn btn-primary w-100 btn-lg mt-3">Register Account</button>
+            </form>
+            
+            <div class="mt-4 text-center">
+                <span class="text-muted">Already a member?</span> 
+                <a href="{% url 'accounts:login' %}" class="text-decoration-none">Login here</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Automatically hide alerts after 5 seconds
+    document.addEventListener("DOMContentLoaded", function() {
+        const alerts = document.querySelectorAll('.alert');
+        alerts.forEach(alert => {
+            setTimeout(() => {
+                alert.classList.remove('show');
+                alert.classList.add('fade');
+                setTimeout(() => alert.remove(), 500); // remove from DOM after fade
+            }, 5000); // 5 seconds
+        });
+    });
+</script>
+{% endblock %}

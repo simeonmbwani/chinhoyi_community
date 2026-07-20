@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% block content %}
+<div class="container mt-5">
+    <h2 class="fw-bold text-primary mb-4">📑 {% trans "My Booking Requests" %}</h2>
+
+    <div class="card shadow-lg border-0 rounded-4">
+        <div class="card-body p-0">
+            <table class="table table-hover mb-0 align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>📌 {% trans "Listing" %}</th>
+                        <th>📂 {% trans "Type" %}</th>
+                        <th>⚖️ {% trans "Status" %}</th>
+                        <th class="text-center">⚡ {% trans "Actions" %}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for booking in bookings %}
+                    <tr>
+                        <!-- Listing -->
+                        <td>
+                            <strong>{{ booking.listing.title }}</strong><br>
+                            <small class="text-muted">{{ booking.listing.category|title }}</small>
+                        </td>
+
+                        <!-- Type -->
+                        <td>
+                            <span class="badge bg-info text-dark">
+                                {{ booking.get_request_type_display }}
+                            </span>
+                        </td>
+
+                        <!-- Status -->
+                        <td>
+                            {% if booking.status == 'pending' %}
+                                <span class="badge bg-warning text-dark">⏳ {{ booking.status|title }}</span>
+                            {% elif booking.status == 'accepted' %}
+                                <span class="badge bg-success">✅ {{ booking.status|title }}</span>
+                            {% elif booking.status == 'rejected' %}
+                                <span class="badge bg-danger">❌ {{ booking.status|title }}</span>
+                            {% else %}
+                                <span class="badge bg-secondary">{{ booking.status|title }}</span>
+                            {% endif %}
+                        </td>
+
+                        <!-- Actions -->
+                        <td class="text-center">
+                            <a href="{% url 'booking_detail' booking.id %}" 
+                               class="btn btn-sm btn-outline-primary me-2">
+                                🔍 {% trans "View Details" %}
+                            </a>
+                            {% if booking.status == 'pending' %}
+                                <form action="{% url 'cancel_booking' booking.id %}" method="post" class="d-inline">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">
+                                        ❌ {% trans "Cancel" %}
+                                    </button>
+                                </form>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" class="text-center text-muted py-4">
+                            🚀 {% trans "No booking requests yet. Explore the marketplace to get started!" %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<style>
+    .table-hover tbody tr:hover {
+        background-color: #f8f9fa;
+        transition: background-color 0.2s ease-in-out;
+    }
+    .btn-sm {
+        font-size: 0.85rem;
+    }
+</style>
+{% endblock %}

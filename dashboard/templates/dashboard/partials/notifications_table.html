@@ -1,0 +1,46 @@
+<div class="card shadow-sm rounded-4 mb-4"
+     hx-get="{% url 'dashboard:notifications_partial' %}"
+     hx-trigger="load, every 10s"
+     hx-target="this"
+     hx-swap="outerHTML">
+
+    <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">🔔 Notifications</h5>
+        {% if notifications_unread_count > 0 %}
+            <span class="badge bg-danger">{{ notifications_unread_count }} new</span>
+        {% endif %}
+    </div>
+
+    <div class="list-group list-group-flush" style="max-height: 400px; overflow-y:auto; -webkit-overflow-scrolling:touch;">
+        {% for note in notifications %}
+            <div class="list-group-item d-flex justify-content-between align-items-center {% if not note.is_read %}fw-bold{% endif %}">
+                <div class="text-truncate" style="max-width: 70%;">
+                    {% if note.listing %}
+                        <strong>{{ note.listing.product_name }}</strong><br>
+                    {% endif %}
+                    <p class="small text-muted mb-0 text-truncate">{{ note.message }}</p>
+                </div>
+                <div class="text-end">
+                    <span class="badge bg-secondary">{{ note.timestamp|date:"Y-m-d H:i" }}</span>
+                    {% if not note.is_read %}
+                        <span class="badge bg-danger ms-2">New</span>
+                    {% endif %}
+                </div>
+            </div>
+        {% empty %}
+            <div class="list-group-item text-center text-muted">
+                No new notifications.
+            </div>
+        {% endfor %}
+    </div>
+</div>
+
+<style>
+.list-group-item {
+    transition: background-color 0.2s ease-in-out;
+    padding: 0.75rem 1rem;
+}
+.list-group-item:hover {
+    background-color: #f8f9fa;
+}
+</style>

@@ -1,0 +1,15 @@
+<div class="card shadow-sm rounded-4">
+    <div class="card-header bg-dark text-white">
+        <h5 class="mb-0">Buyer Overview</h5>
+    </div>
+    <div class="card-body">
+        <p>Upcoming Bookings: <strong>{{ upcoming_bookings_count }}</strong></p>
+        <p>Unread Messages: <strong>{{ messages_unread_count }}</strong></p>
+        <p>Reviews Given: <strong>{{ buyer_reviews_count }}</strong></p>
+        <p>Feedback Received: <strong>{{ buyer_feedback_count }}</strong></p>
+        <p>Updates: <strong>{{ buyer_updates_count }}</strong></p>
+
+        <!-- ✅ Chats link added here -->
+        <p>Chats: <a href="{% url 'dashboard:dashboard_chats' %}" class="small ms-2">Open Conversations</a></p>
+    </div>
+</div>

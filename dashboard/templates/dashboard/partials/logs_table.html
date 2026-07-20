@@ -1,0 +1,90 @@
+<!-- ⚡ Real-Time Activity Log -->
+<div class="table-responsive mb-4" style="max-height: 400px; overflow-y:auto; -webkit-overflow-scrolling:touch;">
+    <table class="table table-striped table-hover table-sm align-middle shadow-sm mb-0">
+        <thead class="table-dark sticky-top">
+            <tr>
+                <th>Timestamp</th>
+                <th>Actor</th>
+                <th>Action</th>
+                <th>Target User</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for log in audit_logs %}
+            <tr>
+                <td><small class="text-muted">{{ log.timestamp|date:"Y-m-d H:i" }}</small></td>
+                <td class="text-truncate" style="max-width: 120px;">
+                    {% if log.actor %}
+                        {{ log.actor.username }}
+                    {% else %}
+                        <span class="text-muted">System</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <span class="badge 
+                        {% if 'Approved' in log.action %}bg-success
+                        {% elif 'Suspended' in log.action %}bg-warning
+                        {% else %}bg-secondary{% endif %}">
+                        {{ log.action }}
+                    </span>
+                </td>
+                <td class="text-truncate" style="max-width: 120px;">
+                    {% if log.target_user %}
+                        {{ log.target_user.username }}
+                    {% else %}
+                        <span class="text-muted">N/A</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4" class="text-center text-muted">No activity logs available.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- 💳 Recent Transactions -->
+<h5 class="mt-4">💳 Recent Transactions</h5>
+<div class="table-responsive" style="max-height: 300px; overflow-y:auto; -webkit-overflow-scrolling:touch;">
+    <table class="table table-striped table-hover table-sm align-middle shadow-sm mb-0">
+        <thead class="table-dark sticky-top">
+            <tr>
+                <th>User</th>
+                <th>Amount</th>
+                <th>Reference</th>
+                <th>Status</th>
+                <th>Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for tx in transactions %}
+            <tr>
+                <td class="text-truncate" style="max-width: 120px;">{{ tx.user.username }}</td>
+                <td>${{ tx.amount }}</td>
+                <td class="text-truncate" style="max-width: 150px;">{{ tx.reference }}</td>
+                <td>
+                    <span class="badge 
+                        {% if tx.status == 'Completed' %}bg-success
+                        {% elif tx.status == 'Pending' %}bg-warning
+                        {% else %}bg-danger{% endif %}">
+                        {{ tx.status }}
+                    </span>
+                </td>
+                <td><small class="text-muted">{{ tx.timestamp|date:"Y-m-d H:i" }}</small></td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5" class="text-center text-muted">No transactions available.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<style>
+.table-hover tbody tr:hover {
+    background-color: #f8f9fa;
+}
+</style>

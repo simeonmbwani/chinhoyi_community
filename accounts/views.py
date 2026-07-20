@@ -1,0 +1,182 @@
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth import login, get_user_model
+from django.contrib.auth.views import LoginView
+from django.contrib.auth.decorators import login_required
+from django.urls import reverse_lazy
+from django.contrib import messages
+from .forms import UserRegistrationForm, ProfileEditForm, ReviewForm
+from .models import Wallet
+from django.utils import timezone
+from listings.models import Listing
+from .models import Transaction
+
+User = get_user_model()
+
+def register(request):
+    if request.method == 'POST':
+        form = UserRegistrationForm(request.POST, request.FILES)
+        if form.is_valid():
+            user = form.save(commit=False)
+            # Providers must be verified manually, buyers auto-verified
+            user.is_verified = (user.role != 'provider')
+            user.save()
+            login(request, user)
+            messages.success(request, "Registration successful. Welcome!")
+
+            # 🚨 Redirect providers to payment if unpaid
+            if user.role == "provider" and not user.is_paid:
+              return redirect('accounts:payment_gateway')
+
+            # Buyers go straight to dashboard
+            return redirect('dashboard:dashboard')
+        else:
+            messages.error(request, "Please correct the errors below.")
+    else:
+        form = UserRegistrationForm()
+    return render(request, 'accounts/register.html', {'form': form})
+
+
+class CustomLoginView(LoginView):
+    template_name = 'accounts/login.html'
+    redirect_authenticated_user = True
+    
+    def get_success_url(self):
+        # Explicitly return the dashboard URL
+        return reverse_lazy('dashboard:dashboard')
+
+
+# --- Profile Management ---
+@login_required
+def profile_view(request):
+    return render(request, 'accounts/profile.html')
+
+@login_required
+def edit_profile(request):
+    if request.method == 'POST':
+        form = ProfileEditForm(request.POST, request.FILES, instance=request.user)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Profile updated successfully.")
+            return redirect('profile')
+    else:
+        form = ProfileEditForm(instance=request.user)
+    return render(request, 'accounts/edit_profile.html', {'form': form})
+
+# --- Wallet & Reviews ---
+@login_required
+def wallet_view(request):
+    wallet, _ = Wallet.objects.get_or_create(user=request.user)
+    transactions = wallet.transactions.all().order_by('-timestamp')
+    return render(request, 'accounts/wallet.html', {
+        'wallet': wallet,
+        'transactions': transactions
+    })
+from listings.models import Listing
+
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import get_object_or_404, redirect, render
+from django.contrib import messages
+from .forms import ReviewForm
+from listings.models import Listing
+
+from django.http import JsonResponse
+
+@login_required
+def add_review(request, pk):
+    listing_obj = get_object_or_404(Listing, pk=pk)
+    provider = listing_obj.user
+
+    if request.method == "POST":
+        form = ReviewForm(request.POST)
+        if form.is_valid():
+            review = form.save(commit=False)
+            review.listing = listing_obj
+            review.reviewer = request.user
+            review.provider = provider
+            review.save()
+
+            return JsonResponse({
+                "success": True,
+                "reviewer": request.user.username,
+                "rating": review.rating,
+                "comment": review.comment,
+                "created_at": review.created_at.strftime("%b %d, %Y %H:%M"),
+            })
+        else:
+            return JsonResponse({"success": False, "error": "Invalid form"})
+    return JsonResponse({"success": False, "error": "Invalid request"})
+
+from decimal import Decimal
+
+@login_required
+def payment_gateway(request, listing_id=None):
+    listing = None
+    if listing_id:
+        listing = get_object_or_404(Listing, id=listing_id, user=request.user)
+
+    # Define service fee (fixed or percentage)
+    service_fee = Decimal("2.50")  # flat fee
+    if listing:
+        listing_price = listing.price
+        amount = listing_price + service_fee
+    else:
+        listing_price = Decimal("0.00")
+        amount = service_fee
+
+    ECOCASH_NUMBER = "+263775493710"  # move to settings/env later
+
+    if request.method == "POST":
+        transaction_ref = request.POST.get("transaction_ref")
+
+        if transaction_ref:
+            # Save transaction record with both amount and service fee
+            Transaction.objects.create(
+                user=request.user,
+                listing=listing,
+                amount=amount,              # total charged
+                service_fee=service_fee,    # platform fee
+                transaction_type="payment",
+                status="success",
+                reference=transaction_ref,
+                timestamp=timezone.now(),
+            )
+
+            # Mark provider as paid
+            request.user.is_paid = True
+            request.user.save(update_fields=["is_paid"])
+
+            # If tied to a listing, mark payment done but keep inactive until admin approves
+            if listing:
+                listing.payment_reference = transaction_ref
+                listing.payment_date = timezone.now()
+                listing.payment_status = "completed"
+                listing.is_active = False       # stays inactive until admin approves
+                listing.status = "pending"
+                listing.save(update_fields=[
+                    "payment_reference", "payment_date", "payment_status", "is_active", "status"
+                ])
+
+            messages.success(
+                request,
+                f"Payment of ${amount} recorded successfully (Ref: {transaction_ref}). "
+                + ("Awaiting admin approval before your listing goes live." if listing else "Your provider account is now active.")
+            )
+            return redirect("dashboard:dashboard")
+        else:
+            messages.error(request, "Please enter your EcoCash Reference ID to proceed.")
+
+    context = {
+        "listing": listing,
+        "listing_price": listing_price,
+        "service_fee": service_fee,
+        "amount": amount,
+        "ecocash_number": ECOCASH_NUMBER,
+    }
+    return render(request, "accounts/payment.html", context)
+
+
+
+@login_required
+def wallet_topup(request):
+    # later you can add payment gateway logic here
+    return render(request, "accounts/wallet_topup.html")

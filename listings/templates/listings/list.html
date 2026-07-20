@@ -1,0 +1,132 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container py-4">
+    <h2 class="mb-4 text-primary fw-bold">🌍 Community Marketplace</h2>
+    <p class="text-muted mb-4">Browse services and products directly from locals — no middlemen, just community connections.</p>
+
+    <!-- Featured Listings Carousel -->
+    {% if featured_listings %}
+    <div id="featuredCarousel" class="carousel slide mb-5 shadow-sm rounded-4" data-bs-ride="carousel">
+        <div class="carousel-inner">
+            {% for f in featured_listings %}
+            <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                {% if f.image %}
+                <img src="{{ f.image.url }}" class="d-block w-100 rounded-top" style="height: 350px; object-fit: cover;" alt="{{ f.title }}">
+                {% else %}
+                <div class="bg-light d-flex align-items-center justify-content-center" style="height:350px;">
+                    <span class="text-muted">No Image Available</span>
+                </div>
+                {% endif %}
+                <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-50 rounded p-3">
+                    <h5 class="fw-bold">
+                        {{ f.title }}
+                        {% if f.user.is_verified %}
+                            <span class="badge bg-success ms-2">Verified Provider</span>
+                        {% else %}
+                            <span class="badge bg-warning ms-2">Unverified</span>
+                        {% endif %}
+                    </h5>
+                    <p class="mb-1">${{ f.price }}</p>
+                    <a href="{% url 'listing_detail' f.pk %}" class="btn btn-primary btn-sm">View Details</a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#featuredCarousel" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon"></span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#featuredCarousel" data-bs-slide="next">
+            <span class="carousel-control-next-icon"></span>
+        </button>
+    </div>
+    {% endif %}
+
+    <!-- Search & Filters -->
+    <form method="GET" action="{% url 'listings:list_listings' %}" class="mb-4">
+        <div class="row g-2">
+            <div class="col-md-6">
+                <div class="input-group">
+                    <input type="text" name="q" class="form-control" placeholder="🔍 Search items in Chinhoyi..." value="{{ request.GET.q }}">
+                    <button class="btn btn-primary" type="submit">Search</button>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <select name="category" class="form-select">
+                    <option value="">All Categories</option>
+                    <option value="">Property</option>
+                    <option value="">Equipment</option>
+                    <option value="">Service</option>
+                    <option value="">Others</option>
+                    {% for cat in categories %}
+                        <option value="{{ cat.id }}" {% if request.GET.category == cat.id|stringformat:"s" %}selected{% endif %}>{{ cat.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <select name="sort" class="form-select">
+                    <option value="">Sort by</option>
+                    <option value="price_low" {% if request.GET.sort == 'price_low' %}selected{% endif %}>Price: Low to High</option>
+                    <option value="price_high" {% if request.GET.sort == 'price_high' %}selected{% endif %}>Price: High to Low</option>
+                    <option value="recent" {% if request.GET.sort == 'recent' %}selected{% endif %}>Most Recent</option>
+                </select>
+            </div>
+        </div>
+    </form>
+    
+    <!-- Listings Grid -->
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+        {% for listing in listings %}
+        <div class="col">
+            <div class="card h-100 shadow-sm border-0 hover-shadow">
+                {% if listing.image %}
+                <a href="{{ listing.image.url }}" target="_blank">
+                    <img src="{{ listing.image.url }}" class="card-img-top rounded-top" style="height: 200px; object-fit: cover;" alt="{{ listing.title }}">
+                </a>
+                {% else %}
+                <div class="bg-light d-flex align-items-center justify-content-center" style="height:200px;">
+                    <span class="text-muted">No Image Available</span>
+                </div>
+                {% endif %}
+                
+                <div class="card-body">
+                    <h5 class="card-title fw-bold">{{ listing.product_name }}</h5>
+                    <p class="card-text text-primary fw-bold fs-5">${{ listing.price }}</p>
+                    <p class="card-text small text-muted">{{ listing.description|truncatewords:15 }}</p>
+                    
+                    <!-- Status Badge -->
+                    {% if listing.user.is_verified %}
+                        <span class="badge bg-success">Verified Provider</span>
+                    {% else %}
+                        <span class="badge bg-warning">Unverified</span>
+                    {% endif %}
+                </div>
+                <div class="card-footer bg-white border-0 p-3">
+                    <small class="text-muted d-block mb-2">By {{ listing.user.username }} • Posted {{ listing.created_at|date:"M d, Y" }}</small>
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'listings:listing_detail' listing.pk %}" class="btn btn-outline-secondary btn-sm">View Details</a>
+                        
+                        {% if user.is_authenticated and user != listing.user %}
+                            <a href="{% url 'messaging:start_chat_from_listing' listing.id %}" class="btn btn-primary btn-sm">
+                                💬 Message Provider
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="alert alert-info text-center">No items found matching your search. 🚀 Be the first to post!</div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<style>
+    .hover-shadow:hover {
+        transform: translateY(-5px);
+        transition: 0.3s ease-in-out;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    }
+</style>
+{% endblock %}

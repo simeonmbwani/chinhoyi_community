@@ -1,0 +1,37 @@
+<form method="POST" class="card shadow-lg border-0 rounded-4 p-4 mt-4">
+    {% csrf_token %}
+    <h4 class="text-primary fw-bold mb-3">📩 Respond to Customer</h4>
+
+    <!-- Response Textarea -->
+    <div class="mb-3">
+        <label class="form-label fw-bold">📝 {% trans "Response" %}</label>
+        <textarea name="response" class="form-control form-control-lg" rows="4" 
+                  placeholder="{% trans 'Type your detailed response here...' %}" required>
+            {{ booking.provider_response }}
+        </textarea>
+        <div class="form-text text-muted">
+            {% trans "Explain clearly to the customer. Be polite and professional." %}
+        </div>
+    </div>
+
+    <!-- Decision Dropdown -->
+    <div class="mb-3">
+        <label class="form-label fw-bold">⚖️ {% trans "Decision" %}</label>
+        <select name="status" class="form-select form-select-lg" required>
+            <option value="accepted" {% if booking.status == 'accepted' %}selected{% endif %}>
+                ✅ {% trans "Accept" %}
+            </option>
+            <option value="rejected" {% if booking.status == 'rejected' %}selected{% endif %}>
+                ❌ {% trans "Reject" %}
+            </option>
+        </select>
+        <div class="form-text text-muted">
+            {% trans "Choose whether to accept or reject this booking request." %}
+        </div>
+    </div>
+
+    <!-- Submit Button -->
+    <button type="submit" class="btn btn-success btn-lg w-100 mt-3">
+        🚀 {% trans "Send Response to Customer" %}
+    </button>
+</form>

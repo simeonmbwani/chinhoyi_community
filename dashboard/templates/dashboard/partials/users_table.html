@@ -1,0 +1,74 @@
+<div class="table-responsive" style="max-height: 400px; overflow-y:auto; -webkit-overflow-scrolling:touch;">
+    <table class="table table-striped table-hover table-sm align-middle shadow-sm mb-0">
+        <thead class="table-dark sticky-top">
+            <tr>
+                <th>Username</th>
+                <th>Role</th>
+                <th>Status</th>
+                <th>Payment</th>
+                <th>Joined</th>
+                <th class="d-print-none text-end">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for u in all_users %}
+            <tr>
+                <td class="text-truncate" style="max-width: 120px;">{{ u.username }}</td>
+                <td>{{ u.role|title }}</td>
+                <td>
+                    {% if u.verification_status == "approved" %}
+                        <span class="badge bg-success">Approved</span>
+                    {% elif u.verification_status == "rejected" %}
+                        <span class="badge bg-danger">Rejected</span>
+                    {% else %}
+                        <span class="badge bg-warning text-dark">Pending</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if u.role == "provider" %}
+                        {% if u.is_paid %}
+                            <span class="badge bg-success">Paid</span>
+                        {% else %}
+                            <span class="badge bg-danger">Unpaid</span>
+                        {% endif %}
+                    {% else %}
+                        <span class="text-muted">N/A</span>
+                    {% endif %}
+                </td>
+                <td><small class="text-muted">{{ u.created_at|date:"Y-m-d H:i" }}</small></td>
+                <td class="d-print-none text-end">
+                    <button class="btn btn-sm btn-info"
+                            hx-get="{% url 'dashboard:admin_user_verification_partial' u.id %}"
+                            hx-target="#modal-body"
+                            data-bs-toggle="modal"
+                            data-bs-target="#verificationModal">
+                        📄 Docs
+                    </button>
+                    <button class="btn btn-sm btn-success"
+                            hx-post="{% url 'dashboard:admin_manage_user' u.id 'approve' %}"
+                            hx-target="#users-table-body"
+                            hx-swap="innerHTML">✔ Approve</button>
+                    <button class="btn btn-sm btn-warning"
+                            hx-post="{% url 'dashboard:admin_manage_user' u.id 'suspend' %}"
+                            hx-target="#users-table-body"
+                            hx-swap="innerHTML">⏸ Suspend</button>
+                    <button class="btn btn-sm btn-danger"
+                            hx-post="{% url 'dashboard:admin_manage_user' u.id 'delete' %}"
+                            hx-target="#users-table-body"
+                            hx-swap="innerHTML">🗑 Delete</button>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="6" class="text-center text-muted">No users found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<style>
+.table-hover tbody tr:hover {
+    background-color: #f8f9fa;
+}
+</style>
