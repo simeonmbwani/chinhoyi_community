@@ -30,7 +30,15 @@ SECRET_KEY = 'django-insecure-6@mj4x=7(zw=1e0ijsx%d9=m30ae+(8eg!ohj)%u^=+&!q0jsd
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    "chinhoyi-community-1.onrender.com",
+    "localhost",
+    "127.0.0.1"
+]
+
+
+# Get ALLOWED_HOSTS from an environment variable, fallback to localhost
+ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
 
 
 # Application definition
@@ -104,10 +112,6 @@ DATABASES = {
         ssl_require=True
     )
 }
-
-
-
-
 
 # Password validation
 # https://docs.djangoproject.com/en/6.0/ref/settings/#auth-password-validators
