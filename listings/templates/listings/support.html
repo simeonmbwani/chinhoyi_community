@@ -118,7 +118,7 @@
     let faqData = {};
 
     // Load FAQ JSON once
-    fetch("{% staticfiles 'support_faq.json' %}")
+    fetch("{% static 'support_faq.json' %}")
         .then(response => response.json())
         .then(data => { faqData = data; });
 
