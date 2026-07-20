@@ -51,6 +51,8 @@ INSTALLED_APPS = [
     'messaging',
     'dashboard',
     'notifications',
+    'cloudinary',
+    'cloudinary_storage',
     # Add your accounts app here
 
 ]
@@ -158,4 +160,4 @@ STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 AUTH_USER_MODEL = 'accounts.CustomUser'
 
 MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_ROOT = BASE_DIR / 'media'
