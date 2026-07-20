@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 
 from pathlib import Path
 import os
+import dj_database_url
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -52,6 +54,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -91,13 +94,19 @@ CHANNEL_LAYERS = {
 
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
+import os
+import dj_database_url
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    'default': dj_database_url.parse(
+        os.environ.get('DATABASE_URL'),
+        conn_max_age=600,
+        ssl_require=True
+    )
 }
+
+
+
 
 
 # Password validation
@@ -143,7 +152,9 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 # Essential for production deployment
-STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
+
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 AUTH_USER_MODEL = 'accounts.CustomUser'
 
