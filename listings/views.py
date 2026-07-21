@@ -224,9 +224,7 @@ def complete_payment(request, listing_id):
     })
 
 
-from django.shortcuts import render, redirect
-from django.contrib import messages
-from .forms import SupportTicketForm, FeedbackForm
+
 
 @login_required
 def support_ticket_view(request):
