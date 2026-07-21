@@ -35,7 +35,7 @@ urlpatterns = [
     # Support
     path('support/ticket/', views.support_ticket_view, name='support_ticket'),
     path('support/feedback/', views.support_ticket_view, name='feedback'),
-    path("provider/bookings/", views.provider_bookings, name="provider_bookings")
+    path("provider/bookings/", views.provider_bookings, name="provider_bookings"),
     
     path("latest/", views.latest_listings, name="latest"),
 
