@@ -52,7 +52,7 @@ def edit_profile(request):
         if form.is_valid():
             form.save()
             messages.success(request, "Profile updated successfully.")
-            return redirect('profile')
+            return redirect('accounts:profile')
     else:
         form = ProfileEditForm(instance=request.user)
     return render(request, 'accounts/edit_profile.html', {'form': form})
