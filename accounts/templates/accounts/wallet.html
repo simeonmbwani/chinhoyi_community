@@ -6,7 +6,7 @@
 
         <!-- Current Balance -->
         <div class="alert alert-info d-flex justify-content-between align-items-center">
-            <h4 class="mb-0">Current Balance: ${{ wallet.balance|default:"1000.00" }}</h4>
+            <h4 class="mb-0">Current Balance: ${{ wallet.balance|default:"0.00" }}</h4>
             <a href="{% url 'accounts:wallet_topup' %}" class="btn btn-sm btn-success">➕ Top Up</a>
         </div>
 

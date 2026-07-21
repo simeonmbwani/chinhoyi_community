@@ -1,7 +1,6 @@
 {% extends 'base.html' %}
-{% load static %}
 {% load i18n %}
-
+{% load static %}
 {% block content %}
 <div class="container mt-5">
     <div class="row justify-content-center">
@@ -125,9 +124,17 @@
     function toggleChat() {
         const widget = document.getElementById("chat-widget");
         const btn = document.getElementById("chat-toggle-btn");
+        const log = document.getElementById("chat-log");
+
         if (widget.style.display === "none") {
             widget.style.display = "block";
             btn.style.display = "none";
+
+            // 👇 Add automatic support message when chat opens
+            log.innerHTML += `<div class="p-2 mb-1 bg-primary text-white rounded">
+                Support: Hello! How can we assist you today?
+            </div>`;
+            log.scrollTop = log.scrollHeight;
         } else {
             widget.style.display = "none";
             btn.style.display = "block";
@@ -165,4 +172,3 @@
         }
     };
 </script>
-{% endblock %}

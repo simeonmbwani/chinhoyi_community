@@ -124,18 +124,16 @@ def payment_gateway(request, listing_id=None):
         transaction_ref = request.POST.get("transaction_ref")
 
         if transaction_ref:
-            # Save transaction record
+            # ✅ Save transaction record with valid fields only
             Transaction.objects.create(
                 user=request.user,
                 listing=listing,
                 amount=amount,
                 service_fee=service_fee,
                 transaction_type="payment",
-                status="success",
-                reference=transaction_ref,
-                payment_date=timezone.now(),
-                payment_reference=transaction_ref,
-                payment_status="success"
+                status="success",          # use status instead of payment_status
+                reference=transaction_ref  # use reference instead of payment_reference
+                # timestamp is auto_now_add, so no need for payment_date
             )
 
             # ✅ Mark provider as paid
@@ -146,9 +144,9 @@ def payment_gateway(request, listing_id=None):
             if listing:
                 listing.payment_reference = transaction_ref
                 listing.payment_date = timezone.now()
-                listing.payment_status = "completed"
-                listing.is_active = False   # stays inactive until admin approves
-                listing.status = "pending"
+                listing.payment_status = "paid"          # clearer than "completed"
+                listing.is_active = False                # stays inactive until admin approves
+                listing.status = "awaiting_approval"     # distinguish from unpaid
                 listing.save(update_fields=[
                     "payment_reference", "payment_date", "payment_status", "is_active", "status"
                 ])
@@ -172,7 +170,46 @@ def payment_gateway(request, listing_id=None):
     return render(request, "accounts/payment.html", context)
 
 
+from decimal import Decimal
+from django.utils import timezone
+from .models import Wallet, Transaction
+
 @login_required
 def wallet_topup(request):
-    # later you can add payment gateway logic here
-    return render(request, "accounts/wallet_topup.html")
+    wallet, _ = Wallet.objects.get_or_create(user=request.user)
+    ECOCASH_NUMBER = "+263775493710"  # move to settings/env later
+    service_fee = Decimal("0.50")     # example fee for top‑up
+
+    if request.method == "POST":
+        amount = Decimal(request.POST.get("amount", "0"))
+        transaction_ref = request.POST.get("transaction_ref")
+
+        if amount > 0 and transaction_ref:
+            # ✅ Record transaction
+            Transaction.objects.create(
+                user=request.user,
+                wallet=wallet,
+                amount=amount,
+                service_fee=service_fee,
+                transaction_type="deposit",
+                status="success",
+                reference=transaction_ref
+            )
+
+            # ✅ Update wallet balance
+            wallet.balance += amount
+            wallet.save(update_fields=["balance"])
+
+            messages.success(
+                request,
+                f"Wallet topped up with ${amount} (Ref: {transaction_ref})."
+            )
+            return redirect("accounts:wallet")
+        else:
+            messages.error(request, "Please enter a valid amount and EcoCash Reference ID.")
+
+    context = {
+        "wallet": wallet,
+        "ecocash_number": ECOCASH_NUMBER,
+    }
+    return render(request, "accounts/wallet_topup.html", context)
