@@ -20,8 +20,8 @@
                     {% endif %}
 
                     <!-- Listing Info -->
-                    <h5 class="mb-3">Listing: {{ listing.product_name }}</h5>
-                    <p class="text-muted">Category: {{ listing.category }}</p>
+                    <h5 class="mb-3">Listing: {{ listing.title|default:listing.product_name }}</h5>
+                    <p class="text-muted">Category: {{ listing.category|default:"N/A" }}</p>
                     <p class="fw-bold">Listing Price: ${{ listing_price }}</p>
                     <p class="fw-bold">Service Fee: ${{ service_fee }}</p>
                     <p class="fw-bold">Total Amount: ${{ amount }}</p>
