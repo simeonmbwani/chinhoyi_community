@@ -51,11 +51,26 @@ INSTALLED_APPS = [
     'messaging',
     'dashboard',
     'notifications',
+     'pwa',
 
     # Add your accounts app here
 
 ]
 
+# PWA Settings
+PWA_APP_NAME = 'Chinhoyi Community'
+PWA_APP_DESCRIPTION = "Connect directly with locals in Chinhoyi"
+PWA_APP_THEME_COLOR = '#0A0302'
+PWA_APP_BACKGROUND_COLOR = '#ffffff'
+PWA_APP_DISPLAY = 'standalone'
+PWA_APP_SCOPE = '/'
+PWA_APP_START_URL = '/'
+PWA_APP_ICONS = [
+    {
+        'src': '/static/images/logo.png',
+        'sizes': '160x160'
+    }
+]
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     "whitenoise.middleware.WhiteNoiseMiddleware",
