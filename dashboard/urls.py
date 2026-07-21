@@ -6,6 +6,8 @@ app_name = "dashboard"
 urlpatterns = [
     # User dashboards
     path("", views.user_dashboard, name="dashboard"), 
+    path("support/json/", views.support_tickets_json, name="support_tickets_json"),
+    path("payments/json/", views.pending_payments_json, name="pending_payments_json"),
 
     # Admin main dashboard + stats
     path("admin-dashboard-stats/", views.admin_dashboard_stats, name="admin_dashboard_stats"),

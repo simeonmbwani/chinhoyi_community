@@ -2,7 +2,10 @@
 {% block content %}
 <div class="p-2 mb-3 bg-primary text-white rounded-2 shadow-lg text-center">
     <h1 class="display-5 fw-bold">Community Marketplace</h1>
-    <p class="col-md-8 mx-auto fs-4">The No-Middleman Marketplace Is A Solution To Agents (Masondosi), Here You Can Advertise, Rent, Hire, Buy, & Sell Directly </p>
+    <p class="col-md-8 mx-auto fs-4">
+        The No-Middleman Marketplace Is A Solution To Agents (Masondosi). 
+        Advertise, Rent, Hire, Buy & Sell Directly.
+    </p>
     {% if not user.is_authenticated %}
         <a href="{% url 'accounts:register' %}" class="btn btn-light btn-lg mt-3">Join Now</a>
     {% else %}
@@ -11,25 +14,73 @@
 </div>
 
 <div class="d-flex justify-content-between align-items-center mt-5 mb-3">
-    <h2>Latest Listings</h2>
-    <a href="{% url 'listings:list_listings' %}" class="text-decoration-none">View All</a>
+    <h2 class="fw-bold">Latest Listings</h2>
+    <a href="{% url 'listings:list_listings' %}" class="text-decoration-none fw-semibold">View All →</a>
 </div>
 
-<div class="row row-cols-1 row-cols-md-3 g-4">
+<div id="latest-listings" class="row row-cols-1 row-cols-md-3 g-4">
     {% for listing in listings %}
     <div class="col">
-        <div class="card h-100 shadow-sm">
+        <div class="card h-100 shadow-sm border-0 hover-shadow">
             {% if listing.image %}
-                <img src="{{ listing.image.url }}" class="card-img-top" style="height: 200px; object-fit: cover;" alt="{{ listing.title }}">
+                <img src="{{ listing.image.url }}" class="card-img-top rounded-top" style="height: 200px; object-fit: cover;" alt="{{ listing.product_name }}">
+            {% else %}
+                <div class="bg-light d-flex align-items-center justify-content-center" style="height:200px;">
+                    <span class="text-muted">No Image</span>
+                </div>
             {% endif %}
             <div class="card-body">
-                <h5 class="card-title">{{ listing.product_name }}</h5>
-                <p class="card-text text-primary fw-bold">${{ listing.price }}</p>
+                <h5 class="card-title fw-bold">{{ listing.product_name }}</h5>
+                <p class="card-text text-primary fw-bold fs-5">${{ listing.price }}</p>
+                <p class="card-text small text-muted">{{ listing.location }}</p>
             </div>
         </div>
     </div>
     {% empty %}
-        <p>No listings yet. Be the first to post!</p>
+        <div class="col-12">
+            <div class="alert alert-info text-center shadow-sm">
+                🚀 No listings yet. Be the first to post!
+            </div>
+        </div>
     {% endfor %}
 </div>
+
+<style>
+.hover-shadow:hover {
+    transform: translateY(-5px);
+    transition: 0.3s ease-in-out;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+}
+</style>
 {% endblock %}
+<script>
+async function refreshListings() {
+    const response = await fetch("{% url 'listings:latest_json' %}");
+    const data = await response.json();
+    const container = document.getElementById("latest-listings");
+
+    if (data.listings.length > 0) {
+        container.innerHTML = data.listings.map(l => `
+            <div class="col">
+                <div class="card h-100 shadow-sm border-0 hover-shadow">
+                    <div class="card-body">
+                        <h5 class="card-title fw-bold">${l.product_name}</h5>
+                        <p class="card-text text-primary fw-bold fs-5">$${l.price}</p>
+                        <p class="card-text small text-muted">${l.location}</p>
+                    </div>
+                </div>
+            </div>
+        `).join("");
+    } else {
+        container.innerHTML = `
+            <div class="col-12">
+                <div class="alert alert-info text-center shadow-sm">
+                    🚀 No listings yet. Be the first to post!
+                </div>
+            </div>`;
+    }
+}
+
+// refresh every 15 seconds
+setInterval(refreshListings, 15000);
+</script>

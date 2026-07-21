@@ -1,0 +1,37 @@
+<h2>Latest Listings</h2>
+<a href="{% url 'listings:all' %}">View All</a>
+
+{% if listings %}
+    <ul>
+        {% for listing in listings %}
+            <li>
+                <strong>{{ listing.product_name }}</strong> — ${{ listing.price }}
+                <br>
+                <small>{{ listing.location }}</small>
+            </li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>No listings yet. Be the first to post!</p>
+{% endif %}
+<div id="latest-listings"></div>
+
+<script>
+async function fetchListings() {
+    const response = await fetch("{% url 'listings:latest_json' %}");
+    const data = await response.json();
+    const container = document.getElementById("latest-listings");
+
+    if (data.listings.length > 0) {
+        container.innerHTML = data.listings.map(
+            l => `<p><strong>${l.product_name}</strong> — $${l.price} <br><small>${l.location}</small></p>`
+        ).join("");
+    } else {
+        container.innerHTML = "<p>No listings yet. Be the first to post!</p>";
+    }
+}
+
+// refresh every 10 seconds
+setInterval(fetchListings, 10000);
+fetchListings();
+</script>

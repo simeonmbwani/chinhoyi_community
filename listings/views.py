@@ -7,6 +7,12 @@ from .models import Listing
 from .utils import calculate_service_fee
 from .decorators import provider_verified_required
 
+
+def home(request):
+    listings = Listing.objects.filter(is_active=True).order_by('-created_at')[:6]  # show 6 latest
+    return render(request, 'home.html', {'listings': listings})
+
+
 @login_required
 def create_listing(request):
     # 1. Role Check
@@ -224,6 +230,9 @@ def complete_payment(request, listing_id):
     })
 
 
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from .forms import SupportTicketForm, FeedbackForm
 
 
 @login_required
@@ -341,3 +350,25 @@ def provider_listings(request):
     return render(request, "listings/provider_listings.html", {"listings": listings})
 
 
+# listings/views.py
+from django.http import JsonResponse
+from .models import Listing
+
+def latest_listings_json(request):
+    listings = Listing.objects.filter(is_active=True).order_by('-created_at')[:5]
+    data = [
+        {
+            "product_name": l.product_name,
+            "price": str(l.price),
+            "location": l.location,
+        }
+        for l in listings
+    ]
+    return JsonResponse({"listings": data})
+
+from django.shortcuts import render
+from .models import Listing
+
+def latest_listings(request):
+    listings = Listing.objects.filter(is_active=True).order_by('-created_at')[:5]
+    return render(request, 'listings/latest.html', {'listings': listings})

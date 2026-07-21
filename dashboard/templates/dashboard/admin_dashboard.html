@@ -195,4 +195,46 @@
     }
     setInterval(refreshStats, 60000);
 </script>
+<script>
+    async function refreshSupport() {
+        const response = await fetch("{% url 'dashboard:support_tickets_json' %}");
+        const data = await response.json();
+        const container = document.getElementById("support-section");
+
+        if (data.tickets.length > 0) {
+            container.innerHTML = data.tickets.map(t => `
+                <div class="alert alert-info">
+                    <strong>${t.subject}</strong> — ${t.message} 
+                    <span class="badge bg-secondary">${t.status}</span>
+                </div>
+            `).join("");
+        } else {
+            container.innerHTML = "<p>No support tickets yet.</p>";
+        }
+    }
+
+    async function refreshPayments() {
+        const response = await fetch("{% url 'dashboard:pending_payments_json' %}");
+        const data = await response.json();
+        const container = document.getElementById("payments-section");
+
+        if (data.payments.length > 0) {
+            container.innerHTML = data.payments.map(p => `
+                <tr>
+                    <td>${p.listing}</td>
+                    <td>${p.customer}</td>
+                    <td>${p.provider}</td>
+                    <td>${p.status}</td>
+                    <td>${p.created_at}</td>
+                </tr>
+            `).join("");
+        } else {
+            container.innerHTML = "<tr><td colspan='5'>No pending payments</td></tr>";
+        }
+    }
+
+    // refresh every 15 seconds
+    setInterval(refreshSupport, 15000);
+    setInterval(refreshPayments, 15000);
+</script>
 {% endblock %}

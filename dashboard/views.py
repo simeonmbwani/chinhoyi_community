@@ -386,3 +386,35 @@ def admin_transactions_partial(request):
     transactions = Transaction.objects.order_by("-timestamp")[:20]
     return render(request, "dashboard/partials/transactions_table.html", {"transactions": transactions})
 
+from django.http import JsonResponse
+from .models import SupportTicket
+from listings.models import Booking
+
+def support_tickets_json(request):
+    tickets = SupportTicket.objects.filter(user=request.user).order_by('-created_at')
+    data = [
+        {
+            "id": t.id,
+            "subject": t.subject,
+            "message": t.message,
+            "status": t.status,
+            "created_at": t.created_at.strftime("%Y-%m-%d %H:%M"),
+        }
+        for t in tickets
+    ]
+    return JsonResponse({"tickets": data})
+
+def pending_payments_json(request):
+    payments = Booking.objects.filter(payment_status="pending").order_by('-created_at')
+    data = [
+        {
+            "id": p.id,
+            "listing": p.listing.product_name,
+            "customer": p.customer.username,
+            "provider": p.provider.username,
+            "status": p.payment_status,
+            "created_at": p.created_at.strftime("%Y-%m-%d %H:%M"),
+        }
+        for p in payments
+    ]
+    return JsonResponse({"payments": data})
