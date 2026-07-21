@@ -127,3 +127,11 @@ class Review(models.Model):
 
     def __str__(self):
         return f"{self.listing.product_name} review by {self.reviewer.username}"
+
+class Feedback(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    message = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Feedback {self.id} by {self.user.username}"
