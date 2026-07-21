@@ -131,8 +131,8 @@ def payment_gateway(request, listing_id=None):
                 amount=amount,
                 service_fee=service_fee,
                 transaction_type="payment",
-                status="success",          # use status instead of payment_status
-                reference=transaction_ref  # use reference instead of payment_reference
+                status="success",          # valid field
+                reference=transaction_ref  # valid field
                 # timestamp is auto_now_add, so no need for payment_date
             )
 
@@ -145,7 +145,7 @@ def payment_gateway(request, listing_id=None):
                 listing.payment_reference = transaction_ref
                 listing.payment_date = timezone.now()
                 listing.payment_status = "paid"          # clearer than "completed"
-                listing.is_active = False                # stays inactive until admin approves
+                listing.is_active = False                # inactive until admin approves
                 listing.status = "awaiting_approval"     # distinguish from unpaid
                 listing.save(update_fields=[
                     "payment_reference", "payment_date", "payment_status", "is_active", "status"
