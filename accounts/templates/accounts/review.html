@@ -4,17 +4,25 @@
         <form id="reviewForm" method="POST" action="{% url 'accounts:add_review' listing.pk %}">
             {% csrf_token %}
             {{ form.as_p }}
-            <button type="submit" class="btn btn-success">Submit Review</button>
+            <button type="submit" class="btn btn-success" id="submitBtn">Submit Review</button>
+            <span id="loadingSpinner" class="spinner-border spinner-border-sm text-success d-none"></span>
         </form>
     </div>
 
     <!-- Reviews section -->
     <div id="reviewsList" class="mt-4">
         {% for review in listing.reviews.all %}
-            <div class="border-bottom py-2">
-                <strong>{{ review.reviewer.username }}</strong> — {{ review.rating }}⭐
-                <p>{{ review.comment }}</p>
-                <small class="text-muted">{{ review.created_at|date:"M d, Y H:i" }}</small>
+            <div class="card mb-2">
+                <div class="card-body">
+                    <strong>{{ review.reviewer.username }}</strong>
+                    <span class="text-warning">
+                        {% for i in "12345"|slice:":review.rating" %}
+                            ★
+                        {% endfor %}
+                    </span>
+                    <p>{{ review.comment }}</p>
+                    <small class="text-muted">{{ review.created_at|date:"M d, Y H:i" }}</small>
+                </div>
             </div>
         {% empty %}
             <p class="text-muted">No reviews yet. Be the first!</p>
@@ -23,8 +31,14 @@
 </div>
 
 <script>
+const submitBtn = document.getElementById("submitBtn");
+const spinner = document.getElementById("loadingSpinner");
+
 document.getElementById("reviewForm").addEventListener("submit", function(e) {
     e.preventDefault();
+    spinner.classList.remove("d-none");
+    submitBtn.disabled = true;
+
     const form = e.target;
     const formData = new FormData(form);
 
@@ -35,24 +49,30 @@ document.getElementById("reviewForm").addEventListener("submit", function(e) {
     })
     .then(response => response.json())
     .then(data => {
+        spinner.classList.add("d-none");
+        submitBtn.disabled = false;
+
         if (data.success) {
             const reviewsList = document.getElementById("reviewsList");
             const newReview = document.createElement("div");
-            newReview.classList.add("border-bottom", "py-2");
+            newReview.classList.add("card", "mb-2");
             newReview.innerHTML = `
-                <strong>${data.reviewer}</strong> — ${data.rating}⭐
-                <p>${data.comment}</p>
-                <small class="text-muted">${data.created_at}</small>
+                <div class="card-body">
+                    <strong>${data.reviewer}</strong>
+                    <span class="text-warning">${"★".repeat(data.rating)}</span>
+                    <p>${data.comment}</p>
+                    <small class="text-muted">${data.created_at}</small>
+                </div>
             `;
             reviewsList.prepend(newReview);
-
-            // ✅ Clear the form after successful submission
             form.reset();
         } else {
             alert("Error: " + data.error);
         }
     })
     .catch(err => {
+        spinner.classList.add("d-none");
+        submitBtn.disabled = false;
         console.error("Review submission failed:", err);
         alert("Something went wrong. Please try again.");
     });

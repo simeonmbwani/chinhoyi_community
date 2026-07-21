@@ -224,14 +224,40 @@ def complete_payment(request, listing_id):
     })
 
 
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from .forms import SupportTicketForm, FeedbackForm
+
+@login_required
 def support_ticket_view(request):
-    # handle form submission or show ticket form
-    return render(request, 'listings/support.html')
+    if request.method == "POST":
+        form = SupportTicketForm(request.POST, request.FILES)
+        if form.is_valid():
+            ticket = form.save(commit=False)
+            ticket.user = request.user
+            ticket.save()
+            messages.success(request, "✅ Your support ticket has been submitted successfully.")
+            return redirect("listings:support_ticket")
+    else:
+        form = SupportTicketForm()
+
+    return render(request, "listings/support_ticket.html", {"form": form})
 
 
+@login_required
 def feedback(request):
-    # handle form submission or show ticket form
-    return render(request, 'listings/support.html')
+    if request.method == "POST":
+        form = FeedbackForm(request.POST)
+        if form.is_valid():
+            fb = form.save(commit=False)
+            fb.user = request.user
+            fb.save()
+            messages.success(request, "✨ Thank you for your feedback!")
+            return redirect("listings:feedback")
+    else:
+        form = FeedbackForm()
+
+    return render(request, "listings/feedback.html", {"form": form})
 
 # marketplace/views.py
 from django.shortcuts import render, get_object_or_404, redirect

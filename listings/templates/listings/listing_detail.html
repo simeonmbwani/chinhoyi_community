@@ -12,8 +12,9 @@
             {% endif %}
         </p>
         
+        <!-- Image with fallback -->
         <div class="my-4 text-center" style="max-height: 400px; overflow: hidden; background-color: #f8f9fa;">
-            <img src="{{ listing.image.url }}" 
+            <img src="{{ listing.image.url|default:'/static/img/no-image.png' }}" 
                  class="img-fluid rounded" 
                  style="max-height: 400px; width: auto; object-fit: contain;" 
                  alt="{{ listing.product_name }}">
@@ -32,26 +33,29 @@
             <p class="text-muted">No ratings yet</p>
         {% endif %}
         
-        <ul class="list-group mb-3">
+        <div id="reviewsList" class="mb-3">
             {% for review in listing.reviews.all %}
-                <li class="list-group-item">
-                    <strong>{{ review.reviewer.username }}</strong> — {{ review.rating }}⭐
-                    <br>
-                    {{ review.comment }}
-                    <small class="text-muted">({{ review.created_at|date:"M d, Y" }})</small>
-                </li>
+                <div class="card mb-2">
+                    <div class="card-body">
+                        <strong>{{ review.reviewer.username }}</strong>
+                        <span class="text-warning">
+                            {% for i in "12345"|slice:":review.rating" %}★{% endfor %}
+                        </span>
+                        <p>{{ review.comment }}</p>
+                        <small class="text-muted">{{ review.created_at|date:"M d, Y H:i" }}</small>
+                    </div>
+                </div>
             {% empty %}
-                <li class="list-group-item text-center text-muted">No reviews yet. Be the first!</li>
+                <p class="text-muted">No reviews yet. Be the first!</p>
             {% endfor %}
-        </ul>
+        </div>
 
         <!-- Review Form -->
         {% if user.is_authenticated and user != listing.user %}
         <div class="d-flex gap-2 mb-3">
-            <!-- Buttons -->
-          <a href="{% url 'messaging:start_chat_from_listing' listing.id %}" class="btn btn-success">
-        💬 Message Provider
-           </a>
+            <a href="{% url 'messaging:start_chat_from_listing' listing.id %}" class="btn btn-success">
+                💬 Message Provider
+            </a>
             <button type="button" class="btn btn-outline-warning" id="showReviewBtn">Leave a Review</button>
         </div>
 
@@ -101,20 +105,28 @@
                     </div>
                 </div>
             {% else %}
-                <form class="card p-3 border-primary mb-4">
-                    <div class="card p-3 border-primary mb-4">
-    <h5>Schedule or Request Quote</h5>
-    <form method="POST" action="{% url 'listings:create_booking' listing.pk %}">
-        {% csrf_token %}
-        <select name="request_type" class="form-select mb-2">
-            <option value="appointment">Appointment</option>
-            <option value="quote">Request Quote</option>
-        </select>
-        <textarea name="customer_message" class="form-control mb-2" rows="3" placeholder="Add details..."></textarea>
-        <button type="submit" class="btn btn-info w-100">Send Request</button>
-    </form>
-</div>
-</form>
+                <!-- Schedule or Request Quote Card -->
+                <div class="card shadow-sm border-primary mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">Schedule or Request Quote</h5>
+                    </div>
+                    <div class="card-body">
+                        <form method="POST" action="{% url 'listings:create_booking' listing.pk %}">
+                            {% csrf_token %}
+                            <div class="mb-3">
+                                <label class="form-label">Request Type</label>
+                                <select name="request_type" class="form-select">
+                                    <option value="appointment">Appointment</option>
+                                    <option value="quote">Request Quote</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Details</label>
+                                <textarea name="customer_message" class="form-control" rows="3" placeholder="Add details..."></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-info w-100">Send Request</button>
+                        </form>
+                    </div>
                 </div>
             {% endif %}
         {% endif %}

@@ -17,6 +17,7 @@ urlpatterns = [
     path('support/', views.support_view, name='support'),
     path('terms/', views.terms_view, name='terms'),
     path('about/', views.about_view, name='about'),
+    path("feedback/", views.feedback, name="feedback"), 
 
     # Bookings
     path('booking/create/<int:pk>/', views.create_booking, name='create_booking'),
