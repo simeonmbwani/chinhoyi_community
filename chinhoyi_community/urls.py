@@ -17,30 +17,32 @@ Including another URLconf
 from django.contrib import admin
 from django.conf import settings
 from django.conf.urls.static import static
-from django.urls import path,include
+from django.urls import path, include
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
-
 urlpatterns = [
+    # Admin
     path('admin/', admin.site.urls),
+
+    # Core + PWA
     path('', include('core.urls')),
     path('', include('pwa.urls')),
+
+    # Apps
     path('accounts/', include('accounts.urls')),
     path('listings/', include('listings.urls')),
-    path("messaging/", include("messaging.urls", namespace="messaging")),
+    path('messaging/', include(('messaging.urls', 'messaging'), namespace='messaging')),
     path('dashboard/', include('dashboard.urls')),
-    
+
+    # JWT Auth
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-    
-    # Feature Endpoints
+
+    # API Endpoints (DRF routers)
     path('api/', include('listings.api_urls')),
-    path('api/messaging/', include('messaging.api_urls')),# Add this line to include dashboard URLs
-    
-    
+    path('api/messaging/', include('messaging.api_urls')),
 ]
-    
+
+# Serve media files in DEBUG mode
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-   
-

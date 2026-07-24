@@ -126,16 +126,32 @@ REST_FRAMEWORK = {
 
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
-import os
 import dj_database_url
+import os
 
-DATABASES = {
-    'default': dj_database_url.parse(
-        os.environ.get('DATABASE_URL'),
-        conn_max_age=600,
-        ssl_require=True
-    )
-}
+# Check if we are running locally or on Render
+# Render automatically sets 'RENDER' environment variable to 'true'
+IS_RENDER = os.environ.get('RENDER', False)
+
+if IS_RENDER:
+    # Use Render's PostgreSQL when live on the cloud
+    DATABASES = {
+        'default': dj_database_url.parse(
+            os.environ.get('DATABASE_URL'),
+            conn_max_age=600,
+            ssl_require=True
+        )
+    }
+else:
+    # Use local SQLite for all commands on your PC
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
+
+
 
 # Password validation
 # https://docs.djangoproject.com/en/6.0/ref/settings/#auth-password-validators

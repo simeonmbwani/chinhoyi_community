@@ -3,7 +3,7 @@ from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.contrib.admin.views.decorators import staff_member_required
 from accounts.models import CustomUser, Wallet
-from dashboard.models import AuditLog   # <-- keep AuditLog in dashboard app
+from accounts.models import AuditLog   # <-- keep AuditLog in dashboard app
 from listings.models import Listing, Booking
 from accounts.models import Notification
 from django.db.models import Q

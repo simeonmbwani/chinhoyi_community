@@ -112,11 +112,11 @@ class Favorite(models.Model):
 
 
 class Review(models.Model):
-    listing = models.ForeignKey(Listing, related_name="reviews", on_delete=models.CASCADE)
+    listing = models.ForeignKey(Listing, related_name="listings_reviews", on_delete=models.CASCADE)
     reviewer = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
-        related_name="reviews"
+        related_name="listing_reviews"
     )
     rating = models.PositiveSmallIntegerField(default=1)  # 1–5 stars
     comment = models.TextField(blank=True)

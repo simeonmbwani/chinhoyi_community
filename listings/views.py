@@ -121,7 +121,7 @@ def provider_bookings(request):
     bookings = Booking.objects.filter(listing__user=request.user).order_by("-created_at")
     return render(request, "listings/provider_bookings.html", {"bookings": bookings})
 
-from dashboard.models import AuditLog
+from accounts.models import AuditLog
 
 @login_required
 def respond_to_booking(request, booking_id):
@@ -372,3 +372,27 @@ from .models import Listing
 def latest_listings(request):
     listings = Listing.objects.filter(is_active=True).order_by('-created_at')[:5]
     return render(request, 'listings/latest.html', {'listings': listings})
+
+from rest_framework import viewsets
+from .models import Listing, Booking, Favorite, Review, Feedback
+from .serializers import ListingSerializer, BookingSerializer, FavoriteSerializer, ReviewSerializer, FeedbackSerializer
+
+class ListingViewSet(viewsets.ModelViewSet):
+    queryset = Listing.objects.all()
+    serializer_class = ListingSerializer
+
+class BookingViewSet(viewsets.ModelViewSet):
+    queryset = Booking.objects.all()
+    serializer_class = BookingSerializer
+
+class FavoriteViewSet(viewsets.ModelViewSet):
+    queryset = Favorite.objects.all()
+    serializer_class = FavoriteSerializer
+
+class ReviewViewSet(viewsets.ModelViewSet):
+    queryset = Review.objects.all()
+    serializer_class = ReviewSerializer
+
+class FeedbackViewSet(viewsets.ModelViewSet):
+    queryset = Feedback.objects.all()
+    serializer_class = FeedbackSerializer
