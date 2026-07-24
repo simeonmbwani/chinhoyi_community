@@ -18,6 +18,7 @@ from django.contrib import admin
 from django.conf import settings
 from django.conf.urls.static import static
 from django.urls import path,include
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 
 urlpatterns = [
@@ -27,7 +28,14 @@ urlpatterns = [
     path('accounts/', include('accounts.urls')),
     path('listings/', include('listings.urls')),
     path("messaging/", include("messaging.urls", namespace="messaging")),
-    path('dashboard/', include('dashboard.urls')),  # Add this line to include dashboard URLs
+    path('dashboard/', include('dashboard.urls')),
+    
+    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    
+    # Feature Endpoints
+    path('api/', include('listings.api_urls')),
+    path('api/messaging/', include('messaging.api_urls')),# Add this line to include dashboard URLs
     
     
 ]

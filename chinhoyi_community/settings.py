@@ -52,6 +52,9 @@ INSTALLED_APPS = [
     'dashboard',
     'notifications',
      'pwa',
+     'rest_framework',
+    'rest_framework.authtoken',
+    'corsheaders',
 
     # Add your accounts app here
 
@@ -72,6 +75,7 @@ PWA_APP_ICONS = [
     }
 ]
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     "whitenoise.middleware.WhiteNoiseMiddleware",
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -109,7 +113,16 @@ CHANNEL_LAYERS = {
     }
 }
 
+CORS_ALLOW_ALL_ORIGINS = True
 
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticatedOrReadOnly',
+    ],
+}
 
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases

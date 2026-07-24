@@ -1,5 +1,7 @@
 from django.urls import path
 from . import views
+from django.urls import path, include
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 app_name = "listings"
 
@@ -7,6 +9,13 @@ urlpatterns = [
     # General & Marketplace
     path("", views.list_listings, name="list_listings"),
     path("latest/", views.latest_listings, name="latest"),
+    
+    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    
+    # Feature Endpoints
+    path('api/', include('listings.api_urls')),
+    path('api/messaging/', include('messaging.api_urls')),
     
     # Creation
     path("create/", views.create_listing, name="create_listing"),
